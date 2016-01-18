@@ -24,7 +24,7 @@ var FumbleTable = FumbleTable || (function() {
 	},
     
 
-    writeResult = function(rollResult) {
+    writeResult = function(msg, rollResult) {
         sendChat(speakingAs, msgFormat.replace('!roll', rollResult.roll).replace('!result', rollResult.result));
     },
 
@@ -46,7 +46,7 @@ var FumbleTable = FumbleTable || (function() {
         args = msg.content.split(/\s+/);
         switch(args[0]) {
             case apiCommand:
-                writeResult(rollOnTable());
+                writeResult(msg, rollOnTable());
         }
     },
 
