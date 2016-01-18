@@ -1,17 +1,20 @@
-'use strict';
-
 // By:       Jefe
 // Contact:  https://app.roll20.net/users/451842/jefe
 var FumbleTable = FumbleTable || (function() {
+    'use strict';
 
     var version = 0.1,
         rangeMax = 10,
+        apiCommand = "!fumble",
+        speakingAs = "Fumble Table",
+        sendMsgTo = "/w GM ",
+        msgFormat = sendMsgTo + "(!roll) - !result",
         table = [
-            {range: "'1','2','3'", result: "Nothing Happens"},
-            {range: "'4','5'", result: "Fall prone"},
-            {range: "'6','7'", result: "Drop weapon"},
-            {range: "'8','9'", retuls: "Hit ally"},
-            {range: "'10'", results: "Death" }
+            {range: [1,2,3], result: "Nothing Happens"},
+            {range: [4,5], result: "Fall prone"},
+            {range: [6,7], result: "Drop weapon"},
+            {range: [8,9], result: "Hit ally"},
+            {range: [10], result: "Death" }
         ],
 
 
@@ -20,37 +23,44 @@ var FumbleTable = FumbleTable || (function() {
         log('FumbleTable v'+version+' Ready');
 	},
     
-    handleMessages = function(msg) {
-        var result = rollOnTable();
+
+    writeResult = function(rollResult) {
+        sendChat(speakingAs, msgFormat.replace('!roll', rollResult.roll).replace('!result', rollResult.result));
     },
 
     rollOnTable = function() {
         var roll = randomInteger(rangeMax);
-        var parsedRoll = "'"+roll+"'";
-        var checkRange = function(entry){ entry.range.indexOf(parsedRoll) !== -1 };
+        var checkRange = function(entry){ return entry.range.indexOf(roll) !== -1 };
         var tableEntry = _.find(table, checkRange);
         return {
             roll: roll,
-            tableEntry: tableEntry
+            result: tableEntry.result
         };
     },
 
-    registerEventHandlers = function() {
-        if ((typeof(Shell) != "undefined") && (Shell) && (Shell.registerCommand)){
-            Shell.registerCommand("!fumble", "!fumble <subcommand> [args]", "Roll on fumble table", handleMessages);
+    handleInput = function(msg) {
+        var args;
+        if(msg.type !== "api") {
+            return;
         }
-        else{
-            on("chat:message", handleMessages);
+        args = msg.content.split(/\s+/);
+        switch(args[0]) {
+            case apiCommand:
+                writeResult(rollOnTable());
         }
+    },
+
+    init = function() {
+        checkInstall();
+        on("chat:message", handleInput);
     };
 
     return {
-		checkInstall: checkInstall,
-		registerEventHandlers: registerEventHandlers
+		init: init
 	};
 }());
 
 on('ready', function() {
-    FumbleTable.checkInstall();
-    FumbleTable.registerEventHandlers();
+    'use strict';
+    FumbleTable.init();
 });
