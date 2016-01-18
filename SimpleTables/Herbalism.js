@@ -5,11 +5,15 @@
 var Herbalism = Herbalism || (function() {
 
     var version = 0.1,
-        rangeMax = 10,
         apiCommand = "!herbalism",
+        helpCommand = "!herbalism-help",
+        helpMsg = "Herbalism Script Usage: '"+apiCommand+" <terrain type>' where <terrain-type> can be any of common, arctic, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used.",
         speakingAs = "Herbalism Table",
         sendMsgTo = "/w GM ",
-        msgFormat = sendMsgTo + "(!roll) - !result",
+        msgFormat = sendMsgTo + "(!roll) - x!amount '!ingredient' !additionalRules",
+        // rules state chance of special roll is 75-100 on a d100 if 2d6 comes up 2,3,4,10,11,12. This is roughly a 1-9 on a d100 overall chance.
+        chanceOfSpecial = 9,
+        amountMax = 4,
         commonTable = [
             {range: [2,12], ingredient: "Mandrake Root", additionalRules: ""},
             {range: [3,4], ingredient: "Quicksilver Lichen", additionalRules: ""},
@@ -103,7 +107,7 @@ var Herbalism = Herbalism || (function() {
             {range: [6,7,8], ingredient: "Common Ingredient", additionalRules: "Roll on Common Ingredient table"},
             {range: [9], ingredient: "Blue Toadshade", additionalRules: "Find 2x the rolled amount"},
             {range: [10], ingredient: "Wrackwort Bulbs", additionalRules: ""},
-            {range: [11], ingredient: "Hydrathistle", additionalRules: "Find 2x the rolled amount"},
+            {range: [11], ingredient: "Hydrathistle", additionalRules: "Find 2x the rolled amount in rain"},
             {range: [12], ingredient: "Primordial Balm", additionalRules: ""}
         ],
         underdarkTable = [
@@ -120,7 +124,7 @@ var Herbalism = Herbalism || (function() {
             {range: [12], ingredient: "Wisp Stalks", additionalRules: ""}
         ],
         specialTable = [
-            {range: [1], ingredient: "Elemental Water", additionalRules: ""}
+            {range: [2,3,4,5,6,7,8,9,10,11,12], ingredient: "Elemental Water", additionalRules: ""}
         ],
         terrainMap = {
             "common": commonTable,
@@ -135,9 +139,7 @@ var Herbalism = Herbalism || (function() {
             "swamp": swampTable,
             "underdark": underdarkTable,
             "special": specialTable
-        }
-
-
+        };
     
     checkInstall = function() {
         log('Herbalism v'+version+' Ready');
@@ -145,29 +147,55 @@ var Herbalism = Herbalism || (function() {
     
 
     writeResult = function(msg, rollResult) {
-        sendChat(speakingAs, msgFormat.replace('!roll', rollResult.roll).replace('!result', rollResult.result));
+        if(rollResult.error) {
+            sendChat(speakingAs, "Unknown terrain-type '"+rollResult.terrain+"'");            
+        } else {
+            sendChat(speakingAs, msgFormat.replace('!roll', rollResult.roll).replace('!amount', rollResult.amount).replace('!ingredient', rollResult.ingredient).replace('!additionalRules',rollResult.additionalRules));            
+        }
     },
 
-    rollOnTable = function() {
-        var roll = randomInteger(rangeMax);
-        var checkRange = function(entry){ return entry.range.indexOf(roll) !== -1 };
-        var tableEntry = _.find(table, checkRange);
-        return {
-            roll: roll,
-            result: tableEntry.result
+    rollOnTable = function(terrain) {
+        var roll, specialRoll, amountRoll, terrainKey, terrainTable;
+        terrainKey = terrain;
+        specialRoll = randomInteger(100);
+        if(specialRoll <= chanceOfSpecial)
+            terrainKey = "special";
+        terrainTable = terrainMap[terrainKey];
+        if(terrainTable === undefined) {
+            return {
+                error: true,
+                terrain: terrainKey
+            };
+        } else {
+            roll = randomInteger(6) + randomInteger(6);
+            amount = randomInteger(amountMax);
+            var checkRange = function(entry){ return entry.range.indexOf(roll) !== -1 };
+            var tableEntry = _.find(terrainTable, checkRange);
+            return {
+                error: false,
+                terrain: terrainKey,
+                roll: roll,
+                amount: amount,
+                ingredient: tableEntry.ingredient,
+                additionalRules: tableEntry.additionalRules
+            };                        
         };
     },
 
     handleInput = function(msg) {
-        var args;
+        var args, terrain;
         if(msg.type !== "api") {
             return;
-        }
+        };
         args = msg.content.split(/\s+/);
-        switch(args[0]) {
-            case apiCommand:
-                writeResult(msg, rollOnTable());
-        }
+        if(args[0] == apiCommand){
+            terrain = 'common';
+            if(args.length > 1)
+                terrain = args[1];
+            writeResult(msg, rollOnTable(terrain));
+        } else if (args[0) == helpCommand) {
+            sendChat(speakingAs, helpMsg);
+        };
     },
 
     init = function() {
