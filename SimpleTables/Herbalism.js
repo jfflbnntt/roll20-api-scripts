@@ -1,5 +1,6 @@
 // By:       Jefe
 // Contact:  https://app.roll20.net/users/451842/jefe
+// Credits to https://www.reddit.com/user/dalagrath for creating the Herbalism and Alchemy supplement
 'use strict';
 
 var Herbalism = Herbalism || (function() {
