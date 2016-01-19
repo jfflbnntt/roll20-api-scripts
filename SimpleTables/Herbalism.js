@@ -7,7 +7,7 @@ var Herbalism = Herbalism || (function() {
     var version = 0.1,
         apiCommand = "!herbalism",
         helpCommand = "!herbalism-help",
-        helpMsg = "Herbalism Script Usage: '"+apiCommand+" <terrain type>' where <terrain-type> can be any of common, arctic, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used.",
+        helpMsg = "Herbalism Script Usage: '"+apiCommand+" [terrain type]' where [terrain-type] can be any of common, arctic, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used.",
         speakingAs = "Herbalism Table",
         sendMsgTo = "/w GM ",
         msgFormat = sendMsgTo + "(!roll) - x!amount '!ingredient' !additionalRules",
@@ -190,10 +190,11 @@ var Herbalism = Herbalism || (function() {
         args = msg.content.split(/\s+/);
         if(args[0] == apiCommand){
             terrain = 'common';
-            if(args.length > 1)
+            if(args.length > 1) {
                 terrain = args[1];
+            }
             writeResult(msg, rollOnTable(terrain));
-        } else if (args[0) == helpCommand) {
+        } else if (args[0] == helpCommand) {
             sendChat(speakingAs, helpMsg);
         };
     },
