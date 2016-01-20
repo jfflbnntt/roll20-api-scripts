@@ -6,7 +6,7 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
     var version = 0.1,
         rangeMax = 86,
         apiCommand = "!adv-fumble",
-        helpMsg = "Usage - !adv-fumble [name], optional [name] which will search for and return a specific entry by name if found.",
+        helpMsg = "Usage - !adv-fumble [--help] [--private] [name]. Using [name] will search for and return a specific entry by name if found. '--help' will return this message. '--private' will return the result in a whisper.",
         tableName = "Advanced Fumble Table",
         msgTemplate = "&{template:default} {{name=!name}} {{roll=!roll}} {{effect=!effect}} !save",
         table = [
@@ -68,12 +68,15 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
         }
     },
 
-    writeResult = function(msg, result) {
-        var speakingAs = msg.who || tableName;
+    writeResult = function(msg, isPrivate, result) {
+        var whisperOption = "";
+        if(isPrivate)
+            whisperOption = "/w "+msg.who+" ";
         if(result.error) {
-            sendChat(speakingAs, result.message + "\n" + helpMsg);
+            sendChat(tableName, whisperOption + result.message + "\n" + helpMsg);
         } else {
-            sendChat(speakingAs, replaceTemplateValues(result));            
+            var speakingAs = msg.who || tableName;
+            sendChat(speakingAs, whisperOption + replaceTemplateValues(result));            
         }
     },
 
@@ -86,33 +89,42 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
                 error: true,
                 message: "Error - no entry found for roll "+roll
             };
+        } else {
+            return {
+                roll: roll,
+                name: tableEntry.name,
+                effect: tableEntry.effect,
+                save: tableEntry.save
+            };            
         }
-
-        return {
-            roll: roll,
-            name: tableEntry.name,
-            effect: tableEntry.effect,
-            save: tableEntry.save
-        };
     },
 
-    findEntry = function(name) {
-        var checkName = function(entry){ return entry.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 };
+    findEntry = function(params) {
+        var name = params.join('').trim().toLowerCase();
+        var checkName = function(entry){ return entry.name.toLowerCase().trim().indexOf(name) !== -1 };
         var tableEntry = _.find(table, checkName);
         if(tableEntry === undefined) {
             return {
                 error: true,
                 message: "Error - no entry found for name '"+name+"'"
             };
+        } else {
+            return {
+                roll: tableEntry.range[0],
+                name: tableEntry.name,
+                effect: tableEntry.effect,
+                save: tableEntry.save
+            };            
         }
-
-        return {
-            roll: tableEntry.range[0],
-            name: tableEntry.name,
-            effect: tableEntry.effect,
-            save: tableEntry.save
-        };
     },
+
+    getResult = function(params) {
+        if(params === undefined || params.length == 0){
+            return rollOnTable();
+        } else {
+            return findEntry(params);
+        }
+    }
 
     handleInput = function(msg) {
         var args;
@@ -121,12 +133,17 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
         }
         args = msg.content.split(/\s+/);
         if(args[0] == apiCommand) {
-            if (args[1] === undefined)
-                writeResult(msg, rollOnTable());
-            else if(args[1] == "--help")
+            args.shift();
+            if (args[0] == "--help")
                 sendChat(tableName, helpMsg);
-            else
-                writeResult(msg,findEntry(args[1]));
+            else {
+                var isPrivate = false;
+                if(args[0] == "--private") {
+                    isPrivate = true;
+                    args.shift();
+                }
+                writeResult(msg, isPrivate, getResult(args));
+            }
         }
     },
 
