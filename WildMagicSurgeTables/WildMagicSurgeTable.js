@@ -6,9 +6,9 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
     var version = 0.1,
         rangeMax = 100,
         apiCommand = "!wildmagic",
-        speakingAs = "Wild Magic Table",
-        sendMsgTo = "/w GM ",
-        msgFormat = sendMsgTo + "(!roll) - !result",
+        helpMsg = "Usage - !wildmagic [--private], rolls on the wildmagic table, optionally whispers result to roller if --private is used.",
+        tableName = "Wild Magic Table",
+        msgTemplate = "&{template:default} {{name=Wild Magic Surge}} {{roll=!roll}} {{result=!result}}",
         table = [
             {range: [1,2], result: "Roll on this table at the start of each of your turns for the next minute, ignoring this result on subsequent rolls."},
             {range: [3,4], result: "For the next minute, you can see any invisible creature to which you have line of sight."},
@@ -69,8 +69,14 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
 	},
     
 
-    writeResult = function(msg, rollResult) {
-        sendChat(speakingAs, msgFormat.replace('!roll', rollResult.roll).replace('!result', rollResult.result));
+    writeResult = function(msg, rollResult, isPrivate) {
+        var message = msgTemplate.replace('!roll', rollResult.roll).replace('!result', rollResult.result)
+        var speakingAs = msg.who || tableName;
+        if(isPrivate){
+            message = "/w "+msg.who+" "+message;
+            speakingAs = tableName;
+        }
+        sendChat(speakingAs, message);
     },
 
     rollOnTable = function() {
@@ -91,7 +97,14 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
         args = msg.content.split(/\s+/);
         switch(args[0]) {
             case apiCommand:
-                writeResult(msg, rollOnTable());
+                if(args[1] == "--help")
+                    sendChat(tableName, helpMsg);
+                else {
+                    var isPrivate = false;
+                    if(args[1] == "--private")
+                        isPrivate = true;
+                    writeResult(msg, rollOnTable(), isPrivate);                    
+                }
         }
     },
 
