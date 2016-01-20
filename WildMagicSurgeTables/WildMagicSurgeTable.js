@@ -108,17 +108,19 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
         }
     },
 
-    init = function() {
-        checkInstall();
+
+    registerEventHandlers = function() {
         on("chat:message", handleInput);
     };
 
     return {
-		init: init
-	};
+        CheckInstall: checkInstall,
+        RegisterEventHandlers: registerEventHandlers
+    };
 }());
 
 on('ready', function() {
     'use strict';
-    WildMagicSurgeTable.init();
+    WildMagicSurgeTable.CheckInstall();
+    WildMagicSurgeTable.RegisterEventHandlers();
 });
