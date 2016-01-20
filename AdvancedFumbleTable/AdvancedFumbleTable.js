@@ -70,12 +70,14 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
 
     writeResult = function(msg, isPrivate, result) {
         var whisperOption = "";
-        if(isPrivate)
+        var speakingAs = msg.who || tableName;
+        if(isPrivate) {
             whisperOption = "/w "+msg.who+" ";
+            speakingAs = tableName;
+        }
         if(result.error) {
             sendChat(tableName, whisperOption + result.message + "\n" + helpMsg);
         } else {
-            var speakingAs = msg.who || tableName;
             sendChat(speakingAs, whisperOption + replaceTemplateValues(result));            
         }
     },
@@ -124,7 +126,7 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
         } else {
             return findEntry(params);
         }
-    }
+    },
 
     handleInput = function(msg) {
         var args;
@@ -147,17 +149,18 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
         }
     },
 
-    init = function() {
-        checkInstall();
+    registerEventHandlers = function() {
         on("chat:message", handleInput);
     };
 
     return {
-		init: init
+        CheckInstall: checkInstall,
+		RegisterEventHandlers: registerEventHandlers
 	};
 }());
 
 on('ready', function() {
     'use strict';
-    AdvancedFumbleTable.init();
+     AdvancedFumbleTable.CheckInstall();
+     AdvancedFumbleTable.RegisterEventHandlers();
 });
