@@ -8,7 +8,7 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
         apiCommand = "!adv-fumble",
         helpMsg = "Usage - !adv-fumble [--help] [--private] [name]. Using [name] will search for and return a specific entry by name if found. '--help' will return this message. '--private' will return the result in a whisper.",
         tableName = "Advanced Fumble Table",
-        msgTemplate = "&{template:default} {{name=!name}} {{roll=!roll}} {{effect=!effect}} !save",
+        msgTemplate = "&{template:default} {{name=Fumble}} {{roll=!roll}} {{result=!name}} {{effect=!effect}} !save",
         table = [
             {range: [1,2,3],    name: "Humorous Result",        effect: "You fail spectacularly in some humorous way, but otherwise suffer no additional penalty."},
             {range: [4,5,6],    name: "Embarrassing Result",    effect: "You embarrass yourself in front of everyone. Your next attack or skill check is made at Disadvantage."},
