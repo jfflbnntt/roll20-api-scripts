@@ -6,7 +6,7 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
     var version = 0.1,
         rangeMax = 86,
         apiCommand = "!adv-fumble",
-        helpMsg = "Usage - !adv-fumble [--help] [--private] [name]. Using [name] will search for and return a specific entry by name if found. '--help' will return this message. '--private' will return the result in a whisper.",
+        helpMsg = "Usage - !adv-fumble [--help|-h] [--private|-w] [name]. Using [name] will search for and return a specific entry by name if found. '--help' will return this message. '--private' will return the result in a whisper.",
         tableName = "Advanced Fumble Table",
         msgTemplate = "&{template:default} {{name=Fumble}} {{roll=!roll}} {{result=!name}} {{effect=!effect}} !save",
         table = [
@@ -69,17 +69,19 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
     },
 
     writeResult = function(msg, isPrivate, result) {
-        var whisperOption = "";
-        var speakingAs = msg.who || tableName;
-        if(isPrivate) {
-            whisperOption = "/w "+msg.who+" ";
-            speakingAs = tableName;
-        }
+        var message, speakingAs;
         if(result.error) {
-            sendChat(tableName, whisperOption + result.message + "\n" + helpMsg);
+            message = result.message + "\n" + helpMsg;
+            speakingAs = tableName;
         } else {
-            sendChat(speakingAs, whisperOption + replaceTemplateValues(result));            
+            speakingAs = msg.who || tableName;
+            message = replaceTemplateValues(result);
         }
+        if(isPrivate) {
+            speakingAs = tableName;
+            message = "/w "+msg.who+" "+message;
+        }
+        sendChat(speakingAs, message); 
     },
 
     rollOnTable = function() {
@@ -136,11 +138,11 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
         args = msg.content.split(/\s+/);
         if(args[0] == apiCommand) {
             args.shift();
-            if (args[0] == "--help")
+            if (args[0] == "--help" || args[0] == "-h")
                 sendChat(tableName, helpMsg);
             else {
                 var isPrivate = false;
-                if(args[0] == "--private") {
+                if(args[0] == "--private" || args[0] == "-w") {
                     isPrivate = true;
                     args.shift();
                 }

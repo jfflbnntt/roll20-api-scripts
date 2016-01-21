@@ -6,7 +6,7 @@ var SpellMishapTable = SpellMishapTable || (function() {
     var version = 0.1,
         rangeMax = 8,
         apiCommand = "!spell-mishap",
-        helpMsg = "Usage - "+apiCommand+" [--help] [--private]. '--help' will return this message. '--private' will return the result in a whisper.",
+        helpMsg = "Usage - "+apiCommand+" [--help|-h] [--private|-w]. '--help' will return this message. '--private' will return the result in a whisper.",
         tableName = "Spell Mishap Table",
         msgTemplate = "&{template:default} {{name=Spell Mishap}} {{roll=!roll}} {{effect=!effect}}",
         table = [
@@ -28,17 +28,19 @@ var SpellMishapTable = SpellMishapTable || (function() {
     },
 
     writeResult = function(msg, isPrivate, result) {
-        var whisperOption = "";
-        var speakingAs = msg.who || tableName;
-        if(isPrivate) {
-            whisperOption = "/w "+msg.who+" ";
-            speakingAs = tableName;
-        }
+        var message, speakingAs;
         if(result.error) {
-            sendChat(tableName, whisperOption + result.message + "\n" + helpMsg);
+            message = result.message + "\n" + helpMsg;
+            speakingAs = tableName;
         } else {
-            sendChat(speakingAs, whisperOption + replaceTemplateValues(result));            
+            speakingAs = msg.who || tableName;
+            message = replaceTemplateValues(result);
         }
+        if(isPrivate) {
+            speakingAs = tableName;
+            message = "/w "+msg.who+" "+message;
+        }
+        sendChat(speakingAs, message);
     },
 
     rollOnTable = function() {
@@ -70,11 +72,11 @@ var SpellMishapTable = SpellMishapTable || (function() {
         args = msg.content.split(/\s+/);
         if(args[0] == apiCommand) {
             args.shift();
-            if (args[0] == "--help")
+            if (args[0] == "--help" || args[0] == "-h")
                 sendChat(tableName, helpMsg);
             else {
                 var isPrivate = false;
-                if(args[0] == "--private") {
+                if(args[0] == "--private" || args[0] == "-w") {
                     isPrivate = true;
                     args.shift();
                 }

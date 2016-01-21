@@ -6,7 +6,7 @@ var Herbalism = Herbalism || (function() {
 
     var version = 0.2,
         apiCommand = "!herbs",
-        helpMsg = "Usage: '"+apiCommand+" [--help] [--private] [biome], where [biome] can be any of common, arctic, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper.",
+        helpMsg = "Usage: '"+apiCommand+" [--help|-h] [--private|-w] [biome], where [biome] can be any of common, arctic, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper.",
         tableName = "Herbalism Table",
         msgTemplate = "&{template:default} {{name=Herbalism}} {{biome=!biome}} {{roll=!roll}} {{ingredient=!ingredient}} {{amount=!amount}}",
         // rules state chance of special roll is 75-100 on a d100 if 2d6 comes up 2,3,4,10,11,12. This is roughly a 1-9 on a d100 overall chance.
@@ -149,17 +149,19 @@ var Herbalism = Herbalism || (function() {
     },
 
     writeResult = function(msg, isPrivate, result) {
-        var whisperOption = "";
-        var speakingAs = msg.who || tableName;
-        if(isPrivate) {
-            whisperOption = "/w "+msg.who+" ";
-            speakingAs = tableName;
-        }
+        var message, speakingAs;
         if(result.error) {
-            sendChat(tableName, whisperOption + result.message + "\n" + helpMsg);
+            message = result.message + "\n" + helpMsg;
+            speakingAs = tableName;
         } else {
-            sendChat(speakingAs, whisperOption + replaceTemplateValues(result));            
+            speakingAs = msg.who || tableName;
+            message = replaceTemplateValues(result);
         }
+        if(isPrivate) {
+            speakingAs = tableName;
+            message = "/w "+msg.who+" "+message;
+        }
+        sendChat(speakingAs, message);
     },
 
     rollOnTable = function(params) {
@@ -195,11 +197,11 @@ var Herbalism = Herbalism || (function() {
         args = msg.content.split(/\s+/);
         if(args[0] == apiCommand) {
             args.shift();
-            if (args[0] == "--help")
+            if (args[0] == "--help" || args[0] == "-h")
                 sendChat(tableName, helpMsg);
             else {
                 var isPrivate = false;
-                if(args[0] == "--private") {
+                if(args[0] == "--private" || args[0] == "-w") {
                     isPrivate = true;
                     args.shift();
                 }

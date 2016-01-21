@@ -6,7 +6,7 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
     var version = 0.1,
         rangeMax = 100,
         apiCommand = "!wildmagic",
-        helpMsg = "Usage - !wildmagic [--private], rolls on the wildmagic table, optionally whispers result to roller if --private is used.",
+        helpMsg = "Usage - !wildmagic [--help|-h] [--private|-w], rolls on the wildmagic table, optionally whispers result to roller if --private is used. '--help' will return this message.",
         tableName = "Wild Magic Table",
         msgTemplate = "&{template:default} {{name=Wild Magic Surge}} {{roll=!roll}} {{result=!result}}",
         table = [
@@ -60,14 +60,7 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
             {range: [95,96], result: "You and all creatures within 30ft of you gain vulnerability to piercing damage for the next minute."},
             {range: [97,98], result: "You are surrounded by faint, ethereal music for the next minute."},
             {range: [99,100], result: "You regain all expended Sorcery Points!"},
-         ],   
-
-
-    
-    checkInstall = function() {
-        log('WildMagicSurgeTable v'+version+' Ready');
-	},
-    
+         ],
 
     writeResult = function(msg, rollResult, isPrivate) {
         var message = msgTemplate.replace('!roll', rollResult.roll).replace('!result', rollResult.result)
@@ -97,17 +90,20 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
         args = msg.content.split(/\s+/);
         switch(args[0]) {
             case apiCommand:
-                if(args[1] == "--help")
+                if (args[0] == "--help" || args[0] == "-h")
                     sendChat(tableName, helpMsg);
                 else {
                     var isPrivate = false;
-                    if(args[1] == "--private")
+                    if(args[0] == "--private" || args[0] == "-w")
                         isPrivate = true;
                     writeResult(msg, rollOnTable(), isPrivate);                    
                 }
         }
     },
 
+    checkInstall = function() {
+        log(tableName+' v'+version+' Ready');
+    },
 
     registerEventHandlers = function() {
         on("chat:message", handleInput);
