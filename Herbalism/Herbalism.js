@@ -6,9 +6,9 @@ var Herbalism = Herbalism || (function() {
 
     var version = 0.2,
         apiCommand = "!herbs",
-        helpMsg = "Usage: '"+apiCommand+" [--help|-h] [--private|-w] [biome], where [biome] can be any of common, arctic, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper.",
+        helpMsg = "Usage: '"+apiCommand+" [--help|-h] [--private|-w] [biome], where [biome] can be any of common, arctic, coastal, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper.",
         tableName = "Herbalism Table",
-        msgTemplate = "&{template:default} {{name=Herbalism}} {{biome=!biome}} {{roll=!roll}} {{ingredient=!ingredient}} {{amount=!amount}}",
+        msgFormat = "&{template:default} {{name=Herbalism}} {{biome=!biome}} {{roll=!roll}} {{ingredient=!ingredient}} {{amount=!amount}}",
         // rules state chance of special roll is 75-100 on a d100 if 2d6 comes up 2,3,4,10,11,12. This is roughly a 1-9 on a d100 overall chance.
         chanceOfSpecial = 9,
         amountMax = 4,
@@ -128,7 +128,7 @@ var Herbalism = Herbalism || (function() {
             "common": commonTable,
             "arctic": arcticTable,
             "underwater": underwaterTable,
-            "costal": underwaterTable,
+            "coastal": underwaterTable,
             "desert": desertTable,
             "forest": forestTable,
             "grasslands": grasslandsTable,
@@ -140,7 +140,7 @@ var Herbalism = Herbalism || (function() {
         },
     
     replaceTemplateValues = function(result) {
-        var message = msgTemplate.replace('!biome', result.biome).replace('!roll', result.roll).replace('!amount', result.amount).replace('!ingredient', result.ingredient);
+        var message = msgFormat.replace('!biome', result.biome).replace('!roll', result.roll).replace('!amount', result.amount).replace('!ingredient', result.ingredient);
         if(result.additionalRules){
             return message + " {{notes="+result.additionalRules+"}}";
         } else {
