@@ -4,14 +4,19 @@
 var Herbalism = Herbalism || (function() {
     'use strict';
 
+    //config values
     var version = 0.2,
         apiCommand = "!herbs",
-        helpMsg = "Usage: '"+apiCommand+" [--help|-h] [--private|-w] [biome], where [biome] can be any of common, arctic, coastal, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper.",
+        helpMsg = "Usage: '"+apiCommand+" [--help|-h] [--private|-w] [terrain], where [terrain] can be any of common, arctic, coastal, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper.",
         tableName = "Herbalism Table",
-        msgFormat = "&{template:default} {{name=Herbalism}} {{biome=!biome}} {{roll=!roll}} {{ingredient=!ingredient}} {{amount=!amount}}",
+        msgFormat = "&{template:default} {{name=Herbalism}} {{terrain=!terrain}} {{roll=!roll}} {{ingredient=!ingredient}} {{amount=!amount}}",
         // rules state chance of special roll is 75-100 on a d100 if 2d6 comes up 2,3,4,10,11,12. This is roughly a 1-9 on a d100 overall chance.
         chanceOfSpecial = 9,
         amountMax = 4,
+        // change to false if you don't want to auto-roll common ingredients
+        autoRollIfCommon = true,
+        // change to true if you want to auto-reroll bloodgrass
+        autoReRerollIfBloodgrass = false,
         commonTable = [
             {range: [2,12], ingredient: "Mandrake Root"},
             {range: [3,4], ingredient: "Quicksilver Lichen"},
@@ -124,7 +129,7 @@ var Herbalism = Herbalism || (function() {
         specialTable = [
             {range: [2,3,4,5,6,7,8,9,10,11,12], ingredient: "Elemental Water"}
         ],
-        biomeMap = {
+        terrainMap = {
             "common": commonTable,
             "arctic": arcticTable,
             "underwater": underwaterTable,
@@ -140,7 +145,7 @@ var Herbalism = Herbalism || (function() {
         },
     
     replaceTemplateValues = function(result) {
-        var message = msgFormat.replace('!biome', result.biome).replace('!roll', result.roll).replace('!amount', result.amount).replace('!ingredient', result.ingredient);
+        var message = msgFormat.replace('!terrain', result.terrain).replace('!roll', result.roll).replace('!amount', result.amount).replace('!ingredient', result.ingredient);
         if(result.additionalRules){
             return message + " {{notes="+result.additionalRules+"}}";
         } else {
@@ -164,23 +169,30 @@ var Herbalism = Herbalism || (function() {
         sendChat(speakingAs, message);
     },
 
-    rollOnTable = function(params) {
-        var biomeName, biomeTable;
-        biomeName = params[0] || "common";
-        if(randomInteger(100) <= chanceOfSpecial)
-            biomeName = "special";
-        biomeTable = biomeMap[biomeName];
-        if(biomeTable === undefined) {
+    rollOnTable = function(terrain) {
+        var terrainName, terrainTable;
+        terrainName = terrain || "common";
+        //exclude 'common' from special chance
+        if(terrainName != "common" && randomInteger(100) <= chanceOfSpecial)
+            terrainName = "special";
+        terrainTable = terrainMap[terrainName];
+        if(terrainTable === undefined) {
             return {
                 error: true,
-                message: "Unknown biome '"+biomeName+"'"
+                message: "Unknown terrain '"+terrainName+"'"
             };
         } else {
             var roll = randomInteger(6) + randomInteger(6);
             var checkRange = function(entry){ return entry.range.indexOf(roll) !== -1 };
-            var entry = _.find(biomeTable, checkRange);
+            var entry = _.find(terrainTable, checkRange);
+            if(entry.ingredient == "Bloodgrass" && autoReRerollIfBloodgrass) {
+                return rollOnTable(terrain);
+            }
+            if(entry.ingredient == "Common Ingredient" && autoRollIfCommon) {
+                return rollOnTable("common");
+            }
             return {
-                biome: biomeName,
+                terrain: terrainName,
                 roll: roll,
                 amount: randomInteger(amountMax),
                 ingredient: entry.ingredient,
@@ -205,7 +217,7 @@ var Herbalism = Herbalism || (function() {
                     isPrivate = true;
                     args.shift();
                 }
-                writeResult(msg, isPrivate, rollOnTable(args));
+                writeResult(msg, isPrivate, rollOnTable(args[0]));
             }
         }
     },
