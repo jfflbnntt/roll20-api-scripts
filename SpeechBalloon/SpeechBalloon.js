@@ -178,6 +178,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 				height: approximateHeight + 6,
 				top: topOffsetBubble,
 				left: leftOffsetBubble, 
+				tint_color: bubbleFillTint, 
 			});
             toFront(bubbleParts.bubbleBorder);
 		}
@@ -190,6 +191,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 				left: leftTail,
 				fliph: tailFlipH,
 				flipv: tailFlipV,
+				tint_color: bubbleFillTint, 
 			});
             toFront(bubbleParts.bubbleTail);
 		}
