@@ -254,8 +254,12 @@ var SpeechBalloon = SpeechBalloon || (function(){
 			thisX;
 
 		switch(args.shift()) {
-			case "!makeBubble": 
-				if ( ! checkSelect(obj,"graphic") ) {return; }
+			case "!say":
+				if ( ! checkSelect(obj,"graphic") ) {
+					//at least show the message if they forgot to select a token
+					sendChat(msg.who, args.join(' '));
+					return;
+				}
 				state.SpeechBalloon.queue.push({
                     token: getObj("graphic", obj._id),
                     page: getObj('page',getObj("graphic", obj._id).get('pageid')),
