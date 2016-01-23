@@ -4,8 +4,8 @@ var SpeechBalloon = SpeechBalloon || (function(){
     'use strict';
 
     var version = 0.1,
-        schemaVersion = 0.4,
-		defaultShowLength = 4, // seconds
+        schemaVersion = 0.5,
+		defaultShowLength = 8, // seconds
 		msPerSec = 1000, // for conversions.. no magic numbers!
 		checkStepRate = 1000, //ms  = 1 second
 		checkInterval = false,
@@ -35,6 +35,17 @@ var SpeechBalloon = SpeechBalloon || (function(){
         }
 	},
 
+	cleanState = function() {
+		log('SpeechBalloon: Resetting state');
+		/* Default Settings stored in the state. */
+		state.SpeechBalloon = {
+			version: schemaVersion,
+			pageGraphicMap: {},
+			queue: [],
+			validUntil: 0,
+			bubbleShown: false
+		};
+	},
 
     checkBubbleDisplay = function() {
 		var nextBubble, newLastBubble, page, lastPage, token;
@@ -134,8 +145,8 @@ var SpeechBalloon = SpeechBalloon || (function(){
 	speechBalloon = function(nextBubble) {
         var theseWords = nextBubble.says, whoSaid = nextBubble.token.get("name"), 
             thisMap = nextBubble.page, thisY = nextBubble.token.get("top"),
-            thisX = nextBubble.token.get("left");
-
+            thisX = nextBubble.token.get("left"),
+            bubbleFillTint = nextBubble.player.get("color") || "transparent";
 
         if (theseWords.indexOf("--show|") != 0) {
             sendChat(whoSaid, theseWords);
@@ -166,7 +177,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 				width: approximateWidth + 6,
 				height: approximateHeight + 6,
 				top: topOffsetBubble,
-				left: leftOffsetBubble 
+				left: leftOffsetBubble, 
 			});
             toFront(bubbleParts.bubbleBorder);
 		}
@@ -178,7 +189,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 				top: topTail,
 				left: leftTail,
 				fliph: tailFlipH,
-				flipv: tailFlipV
+				flipv: tailFlipV,
 			});
             toFront(bubbleParts.bubbleTail);
 		}
@@ -188,7 +199,8 @@ var SpeechBalloon = SpeechBalloon || (function(){
 				width: approximateWidth,
 				height: approximateHeight,
 				top: topOffsetBubble,
-				left: leftOffsetBubble 
+				left: leftOffsetBubble,
+				tint_color: bubbleFillTint, 
 			});
             toFront(bubbleParts.bubbleFill);
 		}
@@ -197,7 +209,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 				layer: "map", 
 				text: thisParagraph,
 				top: topOffsetBubble,
-				left: leftOffsetBubble 
+				left: leftOffsetBubble,
 			});
             toFront(bubbleParts.bubbleText);
 		}
@@ -234,29 +246,33 @@ var SpeechBalloon = SpeechBalloon || (function(){
 		var args = msg.content.split(' '),
 			obj =  _.first(msg.selected),
 			playerid = msg.playerid,
+			player = getObj("player", playerid),
 			token,
 			thisY,
 			thisX;
 
-
 		switch(args.shift()) {
-			case "!makebubble": 
+			case "!makeBubble": 
 				if ( ! checkSelect(obj,"graphic") ) {return; }
 				state.SpeechBalloon.queue.push({
                     token: getObj("graphic", obj._id),
                     page: getObj('page',getObj("graphic", obj._id).get('pageid')),
                     says: args.join(' '),
                     duration: defaultShowLength,
+                    player: player,
 				});
 
 			return; 
 
 			case "!bustBubble":
-
-
                 if ( ! checkSelect(obj,"graphic") ) {return; }
                 bustBalloon(getObj('page',getObj("graphic", obj._id).get('pageid')));
- 
+
+        	return;
+
+            case "!cleanBubble":
+            	cleanState();
+
 			return;
 		}
 	},
@@ -264,15 +280,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
 	checkInstall = function() {
 		if( ! _.has(state,'SpeechBalloon') || state.SpeechBalloon.version !== schemaVersion) {
-			log('SpeechBalloon: Resetting state');
-			/* Default Settings stored in the state. */
-			state.SpeechBalloon = {
-				version: schemaVersion,
-				pageGraphicMap: {},
-				queue: [],
-				validUntil: 0,
-				bubbleShown: false
-			};
+			cleanState();
 		}
 
         if( ! _.has(state,'lastBalloon')) {
