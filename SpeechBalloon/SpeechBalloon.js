@@ -7,9 +7,8 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
     var version = 0.2,
         schemaVersion = 0.5,
-		defaultShowLength = 8, // seconds
-		msPerSec = 1000, // for conversions.. no magic numbers!
-		checkStepRate = 1000, //ms  = 1 second
+		defaultShowLength = 4, // seconds
+		checkStepRate = 500, //ms  = 1 second
 
     bustBalloon = function(bubble) {
         if (typeof(bubble) != "undefined") {
@@ -33,16 +32,10 @@ var SpeechBalloon = SpeechBalloon || (function(){
     checkBubbleDisplay = function() {
     	// show new balloons
         if( state.SpeechBalloon.queue.length > 0 ) {
-            var nextBubble = state.SpeechBalloon.queue.shift();
-            if (typeof(nextBubble) != "undefined") {
-            	var page = nextBubble.page;
-            	if(typeof(page) != "undefined" && ! page.get("archived")){
-	                speechBalloon(nextBubble);
-            	}
-            }
+            speechBalloon(state.SpeechBalloon.queue.shift());
         }
         // remove old balloons
-		if(state.SpeechBalloon.shownBubbles.length > 0 && state.SpeechBalloon.shownBubbles[0].validUntil < Date.now()) {
+		if(state.SpeechBalloon.shownBubbles.length > 0 && _.first(state.SpeechBalloon.shownBubbles).validUntil < Date.now()) {
 			bustBalloon(state.SpeechBalloon.shownBubbles.shift());
 		}
 	},
@@ -97,10 +90,16 @@ var SpeechBalloon = SpeechBalloon || (function(){
 	speechBalloon = function(nextBubble) {
 		if (typeof(nextBubble) == "undefined"){ return; }
 
-        var theseWords = nextBubble.says, whoSaid = nextBubble.token.get("name"), 
-            thisMap = nextBubble.page, thisY = nextBubble.token.get("top"),
-            thisX = nextBubble.token.get("left"),
-            bubbleFillTint = nextBubble.player.get("color") || "transparent";
+        var theseWords = nextBubble.says,
+        	thisMap = getObj("page", nextBubble.page),
+        	token = getObj("graphic", nextBubble.token),
+        	player = getObj("player", nextBubble.player), 
+        	whoSaid = token.get("name"), 
+            thisY = token.get("top"),
+            thisX = token.get("left"),
+            bubbleFillTint = player.get("color") || "transparent";
+
+    	if (typeof(thisMap) == "undefined" || thisMap.get("archived")){ return; }
 
         if (theseWords.indexOf("--show|") != 0) {
             sendChat(whoSaid, theseWords);
@@ -123,7 +122,8 @@ var SpeechBalloon = SpeechBalloon || (function(){
 			topOffsetBubble = thisY + ((Math.floor(approximateHeight/2) + 105 < 159 ? 159 : Math.floor(approximateHeight/2) + 105) * yAdjust),
 			bubbleParts = createBubbleParts(thisMap,thisX,thisY),
 			tailFlipH = (-1 !== xAdjust),
-			tailFlipV = (-1 !== yAdjust);
+			tailFlipV = (-1 !== yAdjust),
+			duration = defaultShowLength * lineCount * 1000;
 
         bubbleParts.bubbleBorder.set({
 			layer: "map", 
@@ -170,7 +170,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 			tailId: bubbleParts.bubbleTail.id,
 			fillId: bubbleParts.bubbleFill.id,
 			textId: bubbleParts.bubbleText.id,
-			validUntil: Date.now()+(nextBubble.duration*msPerSec),
+			validUntil: Date.now()+duration,
 		});
 	}, 
 
@@ -199,12 +199,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
 
 		var args = msg.content.split(' '),
-			obj =  _.first(msg.selected),
-			playerid = msg.playerid,
-			player = getObj("player", playerid),
-			token,
-			thisY,
-			thisX;
+			obj =  _.first(msg.selected);
 
 		switch(args.shift()) {
 			case "!say":
@@ -213,12 +208,13 @@ var SpeechBalloon = SpeechBalloon || (function(){
 					sendChat(msg.who, args.join(' '));
 					return;
 				}
+				var token = getObj("graphic", obj._id);
+				// don't store objects, only store primitives
 				state.SpeechBalloon.queue.push({
-                    token: getObj("graphic", obj._id),
-                    page: getObj('page',getObj("graphic", obj._id).get('pageid')),
+                    token: token.get("_id"),
+                    page: token.get("_pageid"),
                     says: args.join(' '),
-                    duration: defaultShowLength,
-                    player: player,
+                    player: msg.playerid,
 				});
 
 			return; 
