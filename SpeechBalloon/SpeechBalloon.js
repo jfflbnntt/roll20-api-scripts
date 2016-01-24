@@ -2,7 +2,6 @@
 // Contact:  https://app.roll20.net/users/451842/jefe
 // Credits: originally created by Stephen S. https://app.roll20.net/users/135636/stephen-s
 // https://app.roll20.net/forum/post/1397909/script-dungeon-buddies-inspired-speech-balloons
-// I've made some improvements including color coding the bubbles based on the player colors and support for multiple bubbles at once
 var SpeechBalloon = SpeechBalloon || (function(){
     'use strict';
 
