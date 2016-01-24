@@ -5,18 +5,11 @@
 var SpeechBalloon = SpeechBalloon || (function(){
     'use strict';
 
-    var version = 0.3,
-        schemaVersion = 0.6,
+    var version = 0.2,
+        schemaVersion = 0.5,
 		defaultShowLength = 8, // seconds
 		msPerSec = 1000, // for conversions.. no magic numbers!
 		checkStepRate = 1000, //ms  = 1 second
-        hiddenState = {
-	        layer: "gmlayer", 
-	        width: 35,
-	        height: 35,
-	        left: 35,
-	        top: 35
-		},
 
     bustBalloon = function(bubble) {
         if (typeof(bubble) != "undefined") {
@@ -25,16 +18,6 @@ var SpeechBalloon = SpeechBalloon || (function(){
             getObj("graphic" , bubble.fillId).remove();
             getObj("text" , bubble.textId).remove();
         }
-	},
-
-	clearBubbles = function() {
-		// var allBubbleParts = findObjs({ isBubblePart: true }).map(function(bubblePart){
-		// 	return {type: bubblePart.type, id: bubblePart.id};
-		// }); 
-		// log("allBubbleParts "+allBubbleParts.length);
-		// _.each(allBubbleParts, function(bubblePart) {
-		// 	getObj(bubblePart.type, bubblePart.id).remove();
-		// });
 	},
 
 	cleanState = function() {
@@ -47,16 +30,18 @@ var SpeechBalloon = SpeechBalloon || (function(){
 		};
 	},
 
-    showNewBalloons = function() {
+    checkBubbleDisplay = function() {
+    	// show new balloons
         if( state.SpeechBalloon.queue.length > 0 ) {
             var nextBubble = state.SpeechBalloon.queue.shift();
-            if (! nextBubble.page.get("archived") ) {
-                speechBalloon(nextBubble);
+            if (typeof(nextBubble) != "undefined") {
+            	var page = nextBubble.page;
+            	if(typeof(page) != "undefined" && ! page.get("archived")){
+	                speechBalloon(nextBubble);
+            	}
             }
         }
-	},
-
-    removeOldBalloons = function() {
+        // remove old balloons
 		if(state.SpeechBalloon.shownBubbles.length > 0 && state.SpeechBalloon.shownBubbles[0].validUntil < Date.now()) {
 			bustBalloon(state.SpeechBalloon.shownBubbles.shift());
 		}
@@ -71,7 +56,6 @@ var SpeechBalloon = SpeechBalloon || (function(){
 					width: 70,
 					height: 70,
 					layer: "gmlayer",
-					isBubblePart: true,
 				};
 
 		bubbleBorder = fixNewObject(createObj("graphic", _.defaults({
@@ -111,6 +95,8 @@ var SpeechBalloon = SpeechBalloon || (function(){
 	},
 
 	speechBalloon = function(nextBubble) {
+		if (typeof(nextBubble) == "undefined"){ return; }
+
         var theseWords = nextBubble.says, whoSaid = nextBubble.token.get("name"), 
             thisMap = nextBubble.page, thisY = nextBubble.token.get("top"),
             thisX = nextBubble.token.get("left"),
@@ -237,8 +223,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
 			return; 
 
-            case "!clearBubbles":
-            	clearBubbles();
+            case "!cleanBubbleState":
             	cleanState();
 
 			return;
@@ -247,11 +232,9 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
 	checkInstall = function() {
 		if( ! _.has(state,'SpeechBalloon') || state.SpeechBalloon.version !== schemaVersion) {
-            log('SpeechBalloon: Resetting state');
 			cleanState();
 		}
-		setInterval(showNewBalloons, checkStepRate);
-		setInterval(removeOldBalloons, checkStepRate);
+		setInterval(checkBubbleDisplay, checkStepRate);
 		log("SpeechBalloon v"+version+" Ready");
 	},
 
