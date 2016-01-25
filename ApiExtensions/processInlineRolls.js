@@ -1,5 +1,5 @@
 // general function for processing inlien rolls and tables
-function processInlinerolls(msg) {
+function processInlineRolls(msg) {
 	if(_.has(msg,'inlinerolls')){
 		return _.chain(msg.inlinerolls)
 		.reduce(function(m,v,k){
