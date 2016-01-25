@@ -90,27 +90,17 @@ var SpeechBalloon = SpeechBalloon || (function(){
 	speechBalloon = function(nextBubble) {
 		if (typeof(nextBubble) == "undefined"){ return; }
 
-        var theseWords = nextBubble.says,
-        	thisMap = getObj("page", nextBubble.page),
+        var thisMap = getObj("page", nextBubble.page),
         	token = getObj("graphic", nextBubble.token),
         	player = getObj("player", nextBubble.player), 
-        	whoSaid = token.get("name"), 
             thisY = token.get("top"),
             thisX = token.get("left"),
             bubbleFillTint = player.get("color") || "transparent";
 
     	if (typeof(thisMap) == "undefined" || thisMap.get("archived")){ return; }
 
-        if (theseWords.indexOf("--show|") != 0) {
-            sendChat(whoSaid, theseWords);
-            theseWords = wordwrap(theseWords, 28, "\n");
-        } else {
-            theseWords = theseWords.replace("--show|", "");
-            theseWords = theseWords.replace(/~/g, " ");
-            theseWords = theseWords.replace(/::/g, "\n");
-        }
 
-		var thisParagraph = theseWords, 
+		var thisParagraph = nextBubble.says, 
 			lineCount = 1 + (thisParagraph.match(/\n/g)||[]).length,
 			approximateWidth = 286,
 			approximateHeight = (lineCount * 25) + 7,  
@@ -183,46 +173,64 @@ var SpeechBalloon = SpeechBalloon || (function(){
 		return str.match( RegExp(regex, 'g') ).join( brk );
 	},
 
-	checkSelect = function(obj,type,command) {
-		if (obj === undefined || obj.length < 1) {
-			return false;
+	getSelectedToken = function(msg) {
+		var obj, token;
+		obj =  _.first(msg.selected);
+		if ( typeof(obj) != "undefined" && obj._type == "graphic" && obj._id) {
+			token = getObj("graphic", obj._id);
 		}
-		if (obj._type !== type) {
-			return false;
+		return token;
+	},
+
+	processSayMessage = function(msg, command, args) {
+		var token = getSelectedToken(msg),
+			origContent = args.join(' ');
+
+		if(typeof(token) == "undefined") {
+			sendChat(msg.who, origContent);
+			return;				
 		}
-		return true;
+
+		var formattedContent;
+
+        if(command == "!show") {
+            formattedContent = origContent.replace(/::/g, "\n").replace(/~/g, " ").replace(/::/g, "\n");
+        } else {
+            sendChat(token.get("name") || msg.who, origContent);
+            formattedContent = wordwrap(origContent, 28, "\n");        	
+        }
+
+		// don't store objects, only store primitives
+		state.SpeechBalloon.queue.push({
+            token: token.get("_id"),
+            page: token.get("_pageid"),
+            says: formattedContent,
+            player: msg.playerid,
+		});
 	},
 
 	handleInput = function(msg) {
 
 		if ( "api" !== msg.type ) {return; }
 
+		var args, command, content;
+		if(typeof(processInlineRolls) == "function") { 
+			content = processInlineRolls(msg);
+		} else { 
+			content = msg.content;
+		};
+        args = content.split(/\s+/);
+        command = args.shift();
 
-		var args = msg.content.split(' '),
-			obj =  _.first(msg.selected);
-
-		switch(args.shift()) {
+		switch(command) {
 			case "!say":
-				if ( ! checkSelect(obj,"graphic") ) {
-					//at least show the message if they forgot to select a token
-					sendChat(msg.who, args.join(' '));
-					return;
-				}
-				var token = getObj("graphic", obj._id);
-				// don't store objects, only store primitives
-				state.SpeechBalloon.queue.push({
-                    token: token.get("_id"),
-                    page: token.get("_pageid"),
-                    says: args.join(' '),
-                    player: msg.playerid,
-				});
-
-			return; 
+			case "!show":
+				processSayMessage(msg, command, args);
+				return; 
 
             case "!cleanBubbleState":
-            	cleanState();
-
-			return;
+            	cleanState(msg, command, args);
+				return;
 		}
 	},
 
