@@ -22,8 +22,7 @@ Simple table for scroll and spell mishaps from the DMG.
 ## ApiExtensions
 global utility functions that support other scripts and macros
 
-### parseInlineRolls
-takes a message object and looks for inline dice and table rolls and replaces returns the processed content.
+- parseInlineRolls: takes a message object and looks for inline dice and table rolls and replaces returns the processed content.
 
 ## SpeechBalloon
 Simple speech balloons based on "Stephen S."'s [ideas](https://app.roll20.net/forum/post/1397909/script-dungeon-buddies-inspired-speech-balloons)
