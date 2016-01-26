@@ -19,13 +19,20 @@ Basic implementation of the Wild Magic Surge table for Wild Sorcerers.
 ## SpellMishapTable
 Simple table for scroll and spell mishaps from the DMG.
 
+## ApiExtensions
+global utility functions that support other scripts and macros
+
+### parseInlineRolls
+takes a message object and looks for inline dice and table rolls and replaces returns the processed content.
+
 ## SpeechBalloon
 Simple speech balloons based on "Stephen S."'s [ideas](https://app.roll20.net/forum/post/1397909/script-dungeon-buddies-inspired-speech-balloons)
 
 Supports showing multiple balloons at once and uses player's color as bubble tint and scales shown time to the length of the message.
 
+Supports simple inline dice and table rolls if you have ApiExtensions/processInlineRolls.js installed
+
 Some ideas not yet implemented:
 - support only one bubble per token at a time, reuse existing if possible
-- parse inline rolls, table rolls, and macros in the speech bubble and in chat
 - optional color parameter to command line
 - optional token select parameter
