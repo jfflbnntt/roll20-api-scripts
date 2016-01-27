@@ -5,17 +5,25 @@
 var SpeechBalloon = SpeechBalloon || (function(){
     'use strict';
 
-    var version = 0.2,
+    var version = 0.3,
         schemaVersion = 0.5,
         defaultShowLength = 4, // seconds
         checkStepRate = 500, //ms  = 1 second
 
     bustBalloon = function(bubble) {
+        var border, tail, fill, text;
         if (typeof(bubble) != "undefined") {
-            getObj("graphic" , bubble.borderId).remove();
-            getObj("graphic" , bubble.tailId).remove();
-            getObj("graphic" , bubble.fillId).remove();
-            getObj("text" , bubble.textId).remove();
+            border = getObj("graphic" , bubble.borderId);
+            if(border) { border.remove(); }
+
+            tail = getObj("graphic" , bubble.tailId);
+            if(tail) { tail.remove(); }
+
+            fill = getObj("graphic" , bubble.fillId);
+            if(fill) { fill.remove(); }
+
+            text = getObj("text" , bubble.textId);
+            if(text) { text.remove();}
         }
     },
 
@@ -40,37 +48,52 @@ var SpeechBalloon = SpeechBalloon || (function(){
         }
     },
 
-    createBubbleParts = function(thisMap,thisX,thisY) {
-        var bubbleBorder, bubbleTail, bubbleFill, bubbleText,
+    findOrCreateBubbleParts = function(thisMap,thisX,thisY,bubble) {
+        var bubbleBorder, bubbleTail, bubbleFill, bubbleText, 
             creationDefaults = {
-                    _pageid: thisMap.id,
-                    top: thisY,
-                    left: thisX,
-                    width: 70,
-                    height: 70,
-                    layer: "gmlayer",
-                };
+                _pageid: thisMap.id,
+                top: thisY,
+                left: thisX,
+                width: 70,
+                height: 70,
+                layer: "gmlayer",
+            };
 
-        bubbleBorder = fixNewObject(createObj("graphic", _.defaults({
-            imgsrc: "https://s3.amazonaws.com/files.d20.io/images/6565520/qJVbhBJQAw7FNDzBubKuNg/thumb.png?1417619659"
-        },creationDefaults)));
+        if(typeof(bubble) != "undefined") {
+            bubbleBorder = getObj("graphic", bubble.borderId);
+            bubbleTail = getObj("graphic", bubble.tailId);
+            bubbleFill = getObj("graphic", bubble.fillId);
+            bubbleText = getObj("text", bubble.textId);
+        } 
 
-        bubbleTail = fixNewObject(createObj("graphic", _.defaults({
-            width: 140,
-            height: 140,
-            imgsrc: "https://s3.amazonaws.com/files.d20.io/images/6565493/BMPVhSPmlFaY_KyB7K8XHQ/thumb.png?1417619533"
-        },creationDefaults)));
+        if(! bubbleBorder) {
+            bubbleBorder = fixNewObject(createObj("graphic", _.defaults({
+                imgsrc: "https://s3.amazonaws.com/files.d20.io/images/6565520/qJVbhBJQAw7FNDzBubKuNg/thumb.png?1417619659"
+            },creationDefaults)));
+        }
 
-        bubbleFill = fixNewObject(createObj("graphic", _.defaults({
-            imgsrc: "https://s3.amazonaws.com/files.d20.io/images/6565524/yTHHF5NwFJcd0ddZ-9nyxg/thumb.png?1417619728"
-        },creationDefaults)));
+        if(! bubbleTail) {
+            bubbleTail = fixNewObject(createObj("graphic", _.defaults({
+                width: 140,
+                height: 140,
+                imgsrc: "https://s3.amazonaws.com/files.d20.io/images/6565493/BMPVhSPmlFaY_KyB7K8XHQ/thumb.png?1417619533"
+            },creationDefaults)));            
+        }
 
-        bubbleText = fixNewObject(createObj("text", _.defaults({
-            text: "DoubleBubbleBumBubblesDouble",
-            font_size: 16,
-            color: "rgb(0,0,0)",
-            font_family: "Courier"
-        },creationDefaults)));
+        if(! bubbleFill ) {
+            bubbleFill = fixNewObject(createObj("graphic", _.defaults({
+                imgsrc: "https://s3.amazonaws.com/files.d20.io/images/6565524/yTHHF5NwFJcd0ddZ-9nyxg/thumb.png?1417619728"
+            },creationDefaults)));            
+        }
+
+        if(! bubbleText ) {
+            bubbleText = fixNewObject(createObj("text", _.defaults({
+                text: "DoubleBubbleBumBubblesDouble",
+                font_size: 16,
+                color: "rgb(0,0,0)",
+                font_family: "Courier"
+            },creationDefaults)));            
+        }
 
         return {
             bubbleBorder: bubbleBorder,
@@ -95,6 +118,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
             player = getObj("player", nextBubble.player), 
             thisY = token.get("top"),
             thisX = token.get("left"),
+            bubble = _.find(state.SpeechBalloon.shownBubbles, function(bub){ return bub.tokenId == nextBubble.token; }),
             bubbleFillTint = player.get("color") || "transparent";
 
         if (typeof(thisMap) == "undefined" || thisMap.get("archived")){ return; }
@@ -110,7 +134,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
             topTail = thisY + (105 * yAdjust),
             leftOffsetBubble = thisX + (210 * xAdjust),
             topOffsetBubble = thisY + ((Math.floor(approximateHeight/2) + 105 < 159 ? 159 : Math.floor(approximateHeight/2) + 105) * yAdjust),
-            bubbleParts = createBubbleParts(thisMap,thisX,thisY),
+            bubbleParts = findOrCreateBubbleParts(thisMap,thisX,thisY,bubble),
             tailFlipH = (-1 !== xAdjust),
             tailFlipV = (-1 !== yAdjust),
             duration = defaultShowLength * lineCount * 1000;
@@ -155,13 +179,22 @@ var SpeechBalloon = SpeechBalloon || (function(){
         });
         toFront(bubbleParts.bubbleText);
 
-        state.SpeechBalloon.shownBubbles.push({
-            borderId: bubbleParts.bubbleBorder.id,
-            tailId: bubbleParts.bubbleTail.id,
-            fillId: bubbleParts.bubbleFill.id,
-            textId: bubbleParts.bubbleText.id,
-            validUntil: Date.now()+duration,
-        });
+        // add updated bubble to shown list with new validUntil date
+        if(! bubble) {
+            state.SpeechBalloon.shownBubbles.push({
+                borderId: bubbleParts.bubbleBorder.id,
+                tailId: bubbleParts.bubbleTail.id,
+                fillId: bubbleParts.bubbleFill.id,
+                textId: bubbleParts.bubbleText.id,
+                tokenId: nextBubble.token,
+                validUntil: Date.now()+duration,
+            });
+        } else {
+            bubble.validUntil = Date.now()+duration;
+        }
+
+        // resort list of shown bubbles so that the bubble popper will grab the oldest one first.
+        state.SpeechBalloon.shownBubbles = _.sortBy(state.SpeechBalloon.shownBubbles, "validUntil");
     }, 
 
     wordwrap = function( str, width, brk, cut ) {
@@ -195,9 +228,12 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
         if(command == "!show") {
             formattedContent = origContent.replace(/::/g, "\n").replace(/~/g, " ").replace(/::/g, "\n");
-        } else {
+        } else if( command == "!say") {
             sendChat(token.get("name") || msg.who, origContent);
             formattedContent = wordwrap(origContent, 28, "\n");         
+        } else if( command == "!emote") {
+            sendChat(token.get("name") || msg.who, "/em "+origContent);
+            formattedContent = wordwrap("** "+origContent+" **", 28, "\n");            
         }
 
         // don't store objects, only store primitives
@@ -213,18 +249,20 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
         if ( "api" !== msg.type ) {return; }
 
-        var args, command, content;
+        var args, command, 
+            content = msg.content;
+
         if(typeof(processInlineRolls) == "function") { 
             content = processInlineRolls(msg);
-        } else { 
-            content = msg.content;
-        };
+        }
+
         args = content.split(/\s+/);
         command = args.shift();
 
         switch(command) {
             case "!say":
             case "!show":
+            case "!emote":
                 processSayMessage(msg, command, args);
                 return; 
 
