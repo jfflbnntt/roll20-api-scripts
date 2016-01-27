@@ -32,6 +32,5 @@ Supports showing multiple balloons at once and uses player's color as bubble tin
 Supports simple inline dice and table rolls if you have ApiExtensions/processInlineRolls.js installed
 
 Some ideas not yet implemented:
-- support only one bubble per token at a time, reuse existing if possible
 - optional color parameter to command line
 - optional token select parameter
