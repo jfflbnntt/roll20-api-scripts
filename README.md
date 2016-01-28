@@ -23,6 +23,7 @@ Simple table for scroll and spell mishaps from the DMG.
 global utility functions that support other scripts and macros
 
 - parseInlineRolls: takes a message object and looks for inline dice and table rolls and replaces returns the processed content.
+- statusMarkerHelpers: a bunch of helper functions that support managing token status markers by id
 
 ## SpeechBalloon
 Simple speech balloons based on "Stephen S."'s [ideas](https://app.roll20.net/forum/post/1397909/script-dungeon-buddies-inspired-speech-balloons)
