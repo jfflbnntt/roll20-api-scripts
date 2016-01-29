@@ -65,7 +65,7 @@ var STATUS_MARKER_IDS = [
 // status names with numbers will be of the format 'status@1'
 function statusMarkersForToken(token) {
     if (typeof(token) != "undefined" && token._type == "graphic") {
-        return token.get("statusmarkers").split(',');
+        return getObj("graphic",token._id).get("statusmarkers").split(',');
     } else {
         return [];
     }
@@ -75,7 +75,7 @@ function statusMarkersForToken(token) {
 function hasStatusMarker(token, statusId) {
     if (typeof(token) != "undefined" && token._type == "graphic") {
         // could be boolean or string number
-        var result = token.get("status_"+statusId);
+        var result = getObj("graphic",token._id).get("status_"+statusId);
         return result || result.length > 0;
     } else {
         return false;
@@ -86,9 +86,9 @@ function hasStatusMarker(token, statusId) {
 function statusMarkerOn(token, statusId, num) {
     if (typeof(token) != "undefined" && token._type == "graphic") {
         if (num) {
-            token.set("status_"+statusId, ""+num);
+            getObj("graphic",token._id).set("status_"+statusId, ""+num);
         } else {
-            token.set("status_"+statusId, true);
+            getObj("graphic",token._id).set("status_"+statusId, true);
         }
     } 
 }
@@ -96,7 +96,7 @@ function statusMarkerOn(token, statusId, num) {
 // turns a status marker off
 function statusMarkerOff(token, statusId) {
     if (typeof(token) != "undefined" && token._type == "graphic") {
-        token.set("status_"+statusId, false);
+        getObj("graphic",token._id).set("status_"+statusId, false);
     }     
 }
 
@@ -112,6 +112,6 @@ function toggleMarker(token, statusId) {
 // clear all statuses
 function clearStatusMarkers(token) {
     if (typeof(token) != "undefined" && token._type == "graphic") {
-        token.set("statusmarkers", "");
+        getObj("graphic",token._id).set("statusmarkers", "");
     }         
 }
