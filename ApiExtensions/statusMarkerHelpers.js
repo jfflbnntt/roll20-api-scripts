@@ -1,4 +1,5 @@
 // helper functions for managing status markers on tokens
+var STATUS_MARKER_HELPERS_VERSION = 0.1;
 
 // list of supported status markers in order of how their icons appear
 var STATUS_MARKER_IDS = [
@@ -106,4 +107,11 @@ function toggleMarker(token, statusId) {
     } else {
         statusMarkerOn(token, statusId);
     }
+}
+
+// clear all statuses
+function clearStatusMarkers(token) {
+    if (typeof(token) != "undefined" && token._type == "graphic") {
+        token.set("statusmarkers", "");
+    }         
 }
