@@ -35,9 +35,12 @@ var ConditionMarkers = ConditionMarkers || (function() {
         ],
 
     findStatus = function(condition) {
-        var found = _.find(conditionToStatusList, function(entry) { return entry.condition == condition;});
-        if (typeof(found) != "undefined") { return found.status; }
-        return "";
+        var found = _.find(conditionToStatusList, function(entry) { 
+            return entry.condition == condition;
+        });
+        if (typeof(found) != "undefined") { 
+            return found.status; 
+        }
     },
 
     processConditionMessage = function(msg, command, args) {
@@ -61,15 +64,17 @@ var ConditionMarkers = ConditionMarkers || (function() {
             });
         }
         else if (command == "!clearConditions") {
-            _.each(msg.select, function(token){
+            _.each(msg.selected, function(token){
                 clearStatusMarkers(token);
             });
         }
 
-    }
+    },
 
     handleInput = function(msg) {
-        if ( "api" !== msg.type ) {return; }
+        if ( "api" !== msg.type ) {
+            return; 
+        }
 
         var args, command, 
             content = msg.content;
@@ -81,7 +86,7 @@ var ConditionMarkers = ConditionMarkers || (function() {
             case "!unsetCondition":
             case "!setCondition":
             case "!condition":
-            case "!clearConditions"
+            case "!clearConditions":
                 processConditionMessage(msg, command, args);
                 return; 
         }
