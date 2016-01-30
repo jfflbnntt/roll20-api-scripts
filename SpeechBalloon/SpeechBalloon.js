@@ -9,6 +9,10 @@ var SpeechBalloon = SpeechBalloon || (function(){
         schemaVersion = 0.5,
         defaultShowLength = 4, // seconds
         checkStepRate = 500, //ms  = 1 second
+        bubbleBorderSrc = "https://s3.amazonaws.com/files.d20.io/images/6565520/qJVbhBJQAw7FNDzBubKuNg/thumb.png?1417619659",
+        bubbleTailSrc = "https://s3.amazonaws.com/files.d20.io/images/6565493/BMPVhSPmlFaY_KyB7K8XHQ/thumb.png?1417619533",
+        bubbleFillSrc = "https://s3.amazonaws.com/files.d20.io/images/6565524/yTHHF5NwFJcd0ddZ-9nyxg/thumb.png?1417619728",
+
 
     bustBalloon = function(bubble) {
         var border, tail, fill, text;
@@ -68,7 +72,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
         if(! bubbleBorder) {
             bubbleBorder = fixNewObject(createObj("graphic", _.defaults({
-                imgsrc: "https://s3.amazonaws.com/files.d20.io/images/6565520/qJVbhBJQAw7FNDzBubKuNg/thumb.png?1417619659"
+                imgsrc: bubbleBorderSrc
             },creationDefaults)));
         }
 
@@ -76,13 +80,13 @@ var SpeechBalloon = SpeechBalloon || (function(){
             bubbleTail = fixNewObject(createObj("graphic", _.defaults({
                 width: 140,
                 height: 140,
-                imgsrc: "https://s3.amazonaws.com/files.d20.io/images/6565493/BMPVhSPmlFaY_KyB7K8XHQ/thumb.png?1417619533"
+                imgsrc: bubbleTailSrc
             },creationDefaults)));            
         }
 
         if(! bubbleFill ) {
             bubbleFill = fixNewObject(createObj("graphic", _.defaults({
-                imgsrc: "https://s3.amazonaws.com/files.d20.io/images/6565524/yTHHF5NwFJcd0ddZ-9nyxg/thumb.png?1417619728"
+                imgsrc: bubbleFillSrc
             },creationDefaults)));            
         }
 
