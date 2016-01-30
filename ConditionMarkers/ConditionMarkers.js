@@ -6,32 +6,33 @@ var ConditionMarkers = ConditionMarkers || (function() {
     
     var version = 0.1,
         conditionToStatusList = [
+            { condition: "blessed",         status: "aura" },
             { condition: "blinded",         status: "bleeding-eye" },
             { condition: "charmed",         status: "chained-heart" },
+            { condition: "concentrating",   status: "stopwatch" },
             { condition: "deafened",        status: "interdiction" },
             { condition: "exhausted",       status: "half-heart" },
+            { condition: "flying",          status: "angel-outfit" },
             { condition: "frightened",      status: "screaming" },
+            { condition: "frozen",          status: "frozen-orb" },
             { condition: "grappled",        status: "grab" },
+            { condition: "hasted",          status: "fluffy-wing" },
+            { condition: "hiding",          status: "ninja-mask" },
             { condition: "incapacitated",   status: "arrowed" },
             { condition: "invisible",       status: "half-haze" },
             { condition: "paralyzed",       status: "padlock" },
             { condition: "petrified",       status: "white-tower" },
             { condition: "poisoned",        status: "skull" },
             { condition: "prone",           status: "back-pain" },
-            { condition: "restrained",      status: "fishing-net" },
-            { condition: "stunned",         status: "pummeled" },
-            { condition: "unconscious",     status: "sleepy" },
-            { condition: "hiding",          status: "ninja-mask" },
-            { condition: "slowed"           status: "snail" },
-            { condition: "concentrating",   status: "stopwatch" },
             { condition: "raging",          status: "strong" },
-            { condition: "hasted",          status: "fluffy-wing" },
-            { condition: "blessed",         status: "aura" },
+            { condition: "restrained",      status: "fishing-net" },
+            { condition: "slowed",          status: "snail" },
+            { condition: "stunned",         status: "pummeled" },
             { condition: "surrendered",     status: "black-flag" },
+            { condition: "targeted",        status: "archery-target" },
+            { condition: "unconscious",     status: "sleepy" },
             { condition: "weakened",        status: "broken-heart" },
             { condition: "webbed",          status: "cobweb" },
-            { condition: "frozen",          status: "frozen-orb" },
-            { condition: "flying",          status: "angel-outfit" },
         ],
 
     findStatus = function(condition) {
@@ -73,7 +74,7 @@ var ConditionMarkers = ConditionMarkers || (function() {
                 clearStatusMarkers(token);
             });
         }
-
+        return;
     },
 
     handleInput = function(msg) {
@@ -81,11 +82,9 @@ var ConditionMarkers = ConditionMarkers || (function() {
             return; 
         }
 
-        var args, command, 
-            content = msg.content;
-
-        args = content.split(/\s+/);
-        command = args.shift();
+        var content = msg.content,
+            args = content.split(/\s+/), 
+            command = args.shift();
 
         switch(command) {
             case "!unsetCondition":
@@ -93,7 +92,7 @@ var ConditionMarkers = ConditionMarkers || (function() {
             case "!condition":
             case "!clearConditions":
                 processConditionMessage(msg, command, args);
-                return; 
+                return;
         }
     },
    

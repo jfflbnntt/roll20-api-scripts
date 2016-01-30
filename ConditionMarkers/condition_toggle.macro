@@ -1,1 +1,1 @@
-!condition ?{Which Condition|blinded|charmed|deafened|exhausted|frightened|grappled|incapacitated|invisible|paralyzed|petrified|poisoned|prone|restrained|stunned|unconscious|hiding|slowed|concentrating|raging|hasted|blessed|surrendered|weakened|webbed|frozen|flying}
+!condition ?{Which Condition|blessed|blinded|charmed|concentrating|deafened|exhausted|frightened|frozen|flying|grappled|hasted|hiding|incapacitated|invisible|paralyzed|petrified|poisoned|prone|raging|restrained|slowed|stunned|surrendered|targeted|unconscious|weakened|webbed}
