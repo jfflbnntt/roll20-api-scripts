@@ -21,13 +21,13 @@ var ConditionMarkers = ConditionMarkers || (function() {
             { condition: "restrained",      status: "fishing-net" },
             { condition: "stunned",         status: "pummeled" },
             { condition: "unconscious",     status: "sleepy" },
-            { condition: "stealth",         status: "ninja-mask" },
+            { condition: "hiding",          status: "ninja-mask" },
             { condition: "slow",            status: "snail" },
-            { condition: "concentration",   status: "stopwatch" },
-            { condition: "rage",            status: "strong" },
+            { condition: "concentrating",   status: "stopwatch" },
+            { condition: "raging",          status: "strong" },
             { condition: "hasted",          status: "fluffy-wing" },
             { condition: "blessed",         status: "aura" },
-            { condition: "surrender",       status: "black-flag" },
+            { condition: "surrendered",     status: "black-flag" },
             { condition: "weakened",        status: "broken-heart" },
             { condition: "webbed",          status: "cobweb" },
             { condition: "frozen",          status: "frozen-orb" },
@@ -47,6 +47,11 @@ var ConditionMarkers = ConditionMarkers || (function() {
         var condition = args.shift(),
             status = findStatus(condition), 
             num = args.shift();
+        
+        if(typeof(status) == "undefined") {
+            sendChat("Condition Script Error", "no status found for condition '"+condition+"'");
+            return;
+        }
 
         if (command == "!condition") { 
             _.each(msg.selected, function(token){ 
