@@ -5,9 +5,8 @@ var Herbalism = Herbalism || (function() {
     'use strict';
 
     //config values
-    var version = 0.2,
-        apiCommand = "!herbs",
-        helpMsg = "Usage: '"+apiCommand+" [--help|-h] [--private|-w] [terrain], where [terrain] can be any of common, arctic, coastal, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper.",
+    var version = 0.3,
+        helpMsg = "Usage: [!herbalism|!herbs] [--help|-h] [--private|-w] [terrain], where [terrain] can be any of common, arctic, coastal, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper.",
         tableName = "Herbalism Table",
         msgFormat = "&{template:default} {{name=Herbalism}} {{terrain=!terrain}} {{roll=!roll}} {{ingredient=!ingredient}} {{amount=!amount}}",
         // rules state chance of special roll is 75-100 on a d100 if 2d6 comes up 2,3,4,10,11,12. This is roughly a 1-9 on a d100 overall chance.
@@ -202,23 +201,27 @@ var Herbalism = Herbalism || (function() {
     },
 
     handleInput = function(msg) {
-        var args;
+        var args, command, param;
         if(msg.type !== "api") {
             return;
         }
         args = msg.content.split(/\s+/);
-        if(args[0] == apiCommand) {
-            args.shift();
-            if (args[0] == "--help" || args[0] == "-h")
-                sendChat(tableName, helpMsg);
-            else {
-                var isPrivate = false;
-                if(args[0] == "--private" || args[0] == "-w") {
-                    isPrivate = true;
-                    args.shift();
+        command = args.shift();
+        switch (command) {
+            case "!herbs":
+            case "!herbalism":
+                param = args.shift();
+                if (param == "--help" || param == "-h")
+                    sendChat(tableName, helpMsg);
+                else {
+                    var isPrivate = false;
+                    if(param == "--private" || param == "-w") {
+                        isPrivate = true;
+                        param = args.shift();
+                    }
+                    writeResult(msg, isPrivate, rollOnTable(param));
                 }
-                writeResult(msg, isPrivate, rollOnTable(args[0]));
-            }
+                return;
         }
     },
 
@@ -231,13 +234,13 @@ var Herbalism = Herbalism || (function() {
     };
 
     return {
-		CheckInstall: checkInstall,
-        RegisterEventHandlers: registerEventHandlers
+		checkInstall: checkInstall,
+        registerEventHandlers: registerEventHandlers
 	};
 }());
 
 on('ready', function() {
     'use strict';
-    Herbalism.CheckInstall();
-    Herbalism.RegisterEventHandlers();
+    Herbalism.checkInstall();
+    Herbalism.registerEventHandlers();
 });
