@@ -12,6 +12,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
         bubbleBorderSrc = "https://s3.amazonaws.com/files.d20.io/images/6565520/qJVbhBJQAw7FNDzBubKuNg/thumb.png?1417619659",
         bubbleTailSrc = "https://s3.amazonaws.com/files.d20.io/images/6565493/BMPVhSPmlFaY_KyB7K8XHQ/thumb.png?1417619533",
         bubbleFillSrc = "https://s3.amazonaws.com/files.d20.io/images/6565524/yTHHF5NwFJcd0ddZ-9nyxg/thumb.png?1417619728",
+        fontFamily = "Courier",
 
 
     bustBalloon = function(bubble) {
@@ -95,7 +96,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
                 text: "DoubleBubbleBumBubblesDouble",
                 font_size: 16,
                 color: "rgb(0,0,0)",
-                font_family: "Courier"
+                font_family: fontFamily
             },creationDefaults)));            
         }
 
@@ -237,7 +238,7 @@ var SpeechBalloon = SpeechBalloon || (function(){
             formattedContent = wordwrap(origContent, 28, "\n");         
         } else if( command == "!emote") {
             sendChat(token.get("name") || msg.who, "/em "+origContent);
-            formattedContent = wordwrap("** "+origContent+" **", 28, "\n");            
+            formattedContent = wordwrap("*"+origContent+"*", 28, "*\n*");            
         }
 
         // don't store objects, only store primitives
@@ -290,8 +291,8 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
 
     return {
-        CheckInstall: checkInstall,
-        RegisterEventHandlers: registerEventHandlers
+        checkInstall: checkInstall,
+        registerEventHandlers: registerEventHandlers
     };
 
 }());
@@ -299,6 +300,6 @@ var SpeechBalloon = SpeechBalloon || (function(){
 
 on("ready",function(){
     'use strict';
-    SpeechBalloon.CheckInstall();
-    SpeechBalloon.RegisterEventHandlers();
+    SpeechBalloon.checkInstall();
+    SpeechBalloon.registerEventHandlers();
 });
