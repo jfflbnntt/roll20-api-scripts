@@ -22,7 +22,7 @@ var ConditionMarkers = ConditionMarkers || (function() {
             { condition: "stunned",         status: "pummeled" },
             { condition: "unconscious",     status: "sleepy" },
             { condition: "hiding",          status: "ninja-mask" },
-            { condition: "slow",            status: "snail" },
+            { condition: "slowed"           status: "snail" },
             { condition: "concentrating",   status: "stopwatch" },
             { condition: "raging",          status: "strong" },
             { condition: "hasted",          status: "fluffy-wing" },
