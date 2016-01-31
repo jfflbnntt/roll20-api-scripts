@@ -4,7 +4,7 @@
 var ConditionMarkers = ConditionMarkers || (function() {
     'use strict';
     
-    var version = 0.1,
+    var version = 0.2,
         conditionToStatusList = [
             { condition: "blessed",         status: "aura" },
             { condition: "blinded",         status: "bleeding-eye" },
@@ -41,38 +41,72 @@ var ConditionMarkers = ConditionMarkers || (function() {
         });
         if (typeof(found) != "undefined") { 
             return found.status; 
+        } else {
+            sendChat("Condition Script Error", "no status found for condition '"+condition+"'");
+            return;
+        }
+    },
+
+    toggleCondition = function(selected, condition) {
+        var status = findStatus(condition);
+        if (status) {
+            _.each(selected, function(token){
+                toggleMarker(token, status); 
+            });            
+        }
+    },
+
+    setCondition = function(selected, condition, num) {
+        var status = findStatus(condition);
+        if (status) {
+            _.each(selected, function(token){ 
+                statusMarkerOn(token, status, num); 
+            });            
+        }
+    },
+
+    unsetCondition = function(selected, condition) {
+        var status = findStatus(condition);
+        if (status) {
+            _.each(selected, function(token){ 
+                statusMarkerOff(token, status); 
+            });            
+        }
+    },
+
+    clearConditions = function(selected) {
+        _.each(selected, function(token){
+            clearStatusMarkers(token);
+        });
+    },
+
+    hasCondition = function(selected, condition, num) {
+        var status = findStatus(condition);
+        if (status) {
+            return _.every(selected, function(token){
+                return hasStatusMarker(token, status, num);
+            });            
         }
     },
 
     processConditionMessage = function(msg, command, args) {
         var condition = args.shift(),
-            status = findStatus(condition), 
             num = args.shift();
         
-        if(typeof(status) == "undefined") {
-            sendChat("Condition Script Error", "no status found for condition '"+condition+"'");
-            return;
-        }
-
         if (command == "!condition") { 
-            _.each(msg.selected, function(token){ 
-                toggleMarker(token, status); 
-            });
+            toggleCondition(msg.selected, condition);
         } 
         else if (command == "!setCondition") {
-            _.each(msg.selected, function(token){ 
-                statusMarkerOn(token, status, num); 
-            });
+            setCondition(msg.selected, condition, num);
         }
         else if (command == "!unsetCondition") {
-            _.each(msg.selected, function(token){ 
-                statusMarkerOff(token, status); 
-            });
+            unsetCondition(msg.selected, condition);
         }
         else if (command == "!clearConditions") {
-            _.each(msg.selected, function(token){
-                clearStatusMarkers(token);
-            });
+            clearConditions(msg.selected);
+        }
+        else if (command == "!hasCondition") {
+            hasCondition(msg.selected, condition, num);
         }
         return;
     },
@@ -91,6 +125,7 @@ var ConditionMarkers = ConditionMarkers || (function() {
             case "!setCondition":
             case "!condition":
             case "!clearConditions":
+            case "!hasCondition":
                 processConditionMessage(msg, command, args);
                 return;
         }
@@ -110,7 +145,12 @@ var ConditionMarkers = ConditionMarkers || (function() {
         
     return {
         checkInstall: checkInstall,
-        registerEventHandlers: registerEventHandlers
+        registerEventHandlers: registerEventHandlers,
+        toggleCondition: toggleCondition,
+        hasCondition: hasCondition,
+        setCondition: setCondition,
+        unsetCondition: unsetCondition,
+        clearConditions: clearConditions
     };
 }());
 
