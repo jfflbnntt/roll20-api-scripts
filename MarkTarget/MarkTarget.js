@@ -24,6 +24,11 @@ var MarkTarget = MarkTarget || (function() {
     },
 
     processTargetMessage = function(msg, command, args) {
+        if (command == "!selectedTarget") {
+            _.each(msg.selected, toggleTarget);
+            return;
+        }
+
         var tokenId = args.shift();
 
         if(typeof(tokenId) == "undefined") {
@@ -59,6 +64,7 @@ var MarkTarget = MarkTarget || (function() {
             case "!markTarget":
             case "!unmarkTarget":
             case "!toggleTarget":
+            case "!selectedTarget":
                 processTargetMessage(msg, command, args);
                 return;
         }
