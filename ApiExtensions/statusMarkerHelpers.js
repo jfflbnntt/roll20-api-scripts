@@ -1,5 +1,5 @@
 // helper functions for managing status markers on tokens
-var STATUS_MARKER_HELPERS_VERSION = 0.1;
+var STATUS_MARKER_HELPERS_VERSION = 0.2;
 
 // list of supported status markers in order of how their icons appear
 var STATUS_MARKER_IDS = [
@@ -64,8 +64,9 @@ var STATUS_MARKER_IDS = [
 // return empty list if not a valid token
 // status names with numbers will be of the format 'status@1'
 function statusMarkersForToken(token) {
-    if (typeof(token) != "undefined" && token._type == "graphic") {
-        return getObj("graphic",token._id).get("statusmarkers").split(',');
+    if (typeof(token) != "undefined") {
+        var tokenId = token._id || token;
+        return getObj("graphic",tokenId).get("statusmarkers").split(',');
     } else {
         return [];
     }
@@ -73,9 +74,10 @@ function statusMarkersForToken(token) {
 
 // check a token for a status by name
 function hasStatusMarker(token, statusId, num) {
-    if (typeof(token) != "undefined" && token._type == "graphic") {
+    if (typeof(token) != "undefined") {
+        var tokenId = token._id || token;
         // could be boolean or string number
-        var result = getObj("graphic",token._id).get("status_"+statusId);
+        var result = getObj("graphic",tokenId).get("status_"+statusId);
         if (typeof(num) != "undefined") {
             return result == num;
         }
@@ -89,19 +91,21 @@ function hasStatusMarker(token, statusId, num) {
 
 // turns a status marker on with optional num value
 function statusMarkerOn(token, statusId, num) {
-    if (typeof(token) != "undefined" && token._type == "graphic") {
+    if (typeof(token) != "undefined") {
+        var tokenId = token._id || token;
         if (num) {
-            getObj("graphic",token._id).set("status_"+statusId, ""+num);
+            getObj("graphic",tokenId).set("status_"+statusId, ""+num);
         } else {
-            getObj("graphic",token._id).set("status_"+statusId, true);
+            getObj("graphic",tokenId).set("status_"+statusId, true);
         }
     } 
 }
 
 // turns a status marker off
 function statusMarkerOff(token, statusId) {
-    if (typeof(token) != "undefined" && token._type == "graphic") {
-        getObj("graphic",token._id).set("status_"+statusId, false);
+    if (typeof(token) != "undefined") {
+        var tokenId = token._id || token;
+        getObj("graphic",tokenId).set("status_"+statusId, false);
     }     
 }
 
@@ -116,7 +120,8 @@ function toggleMarker(token, statusId) {
 
 // clear all statuses
 function clearStatusMarkers(token) {
-    if (typeof(token) != "undefined" && token._type == "graphic") {
-        getObj("graphic",token._id).set("statusmarkers", "");
+    if (typeof(token) != "undefined") {
+        var tokenId = token._id || token;
+        getObj("graphic",tokenId).set("statusmarkers", "");
     }         
 }
