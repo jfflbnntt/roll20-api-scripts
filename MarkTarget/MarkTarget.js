@@ -23,9 +23,25 @@ var MarkTarget = MarkTarget || (function() {
         return hasStatusMarker(tokenId, targetedStatus);
     },
 
+    clearTargets = function() {
+        var targets = filterObjs(function(obj) {
+            return obj.get("_type") == "graphic" && isTarget(obj.id)
+        });
+
+        var ids = _.map(targets, function(obj) { 
+            return obj.id; 
+        });
+
+        _.each(ids, unmarkTarget);
+    },
+
     processTargetMessage = function(msg, command, args) {
-        if (command == "!selectedTarget") {
+        if (command == "!selectedTargets") {
             _.each(msg.selected, toggleTarget);
+            return;
+        } 
+        else if (command == "!clearTargets") {
+            clearTargets();
             return;
         }
 
@@ -64,7 +80,8 @@ var MarkTarget = MarkTarget || (function() {
             case "!markTarget":
             case "!unmarkTarget":
             case "!toggleTarget":
-            case "!selectedTarget":
+            case "!selectedTargets":
+            case "!clearTargets":
                 processTargetMessage(msg, command, args);
                 return;
         }
@@ -89,6 +106,7 @@ var MarkTarget = MarkTarget || (function() {
         markTarget: markTarget,
         unmarkTarget: unmarkTarget,
         toggleTarget: toggleTarget,
+        clearTargets: clearTargets,
     };
 }());
 
