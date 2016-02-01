@@ -35,3 +35,13 @@ Supports simple inline dice and table rolls if you have ApiExtensions/processInl
 Some ideas not yet implemented:
 - optional color parameter to command line
 - optional token select parameter
+
+## ConditionMarkers
+(requires ApiExtensions/statusMarkerHelpers.js)
+Maps standard 5e conditions to a fixed set of standard status markers. Supports setting, unsetting, toggling, and clearing conditions by name. Exports functions to be used by other scripts.
+
+## MarkTarget
+(requires ApiExtensions/statusMarkerHelpers.js)
+Mark a target by token_id or selection with a specific status marker. Set, unset, toggle, and clear functions. Uses the same status marker as the "targeted" condition in ConditionMarkers. Designed to be used with a simple macro that clears old targets, announces the new target, and marks it.
+
+
