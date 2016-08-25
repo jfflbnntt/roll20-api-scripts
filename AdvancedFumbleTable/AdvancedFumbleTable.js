@@ -57,7 +57,7 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
     
     checkInstall = function() {
         log('AdvancedFumbleTable v'+version+' Ready');
-	},
+    },
     
     replaceTemplateValues = function(result) {
         var message = msgTemplate.replace('!name', result.name).replace('!roll', result.roll).replace('!effect', result.effect);
@@ -157,8 +157,8 @@ var AdvancedFumbleTable = AdvancedFumbleTable || (function() {
 
     return {
         CheckInstall: checkInstall,
-		RegisterEventHandlers: registerEventHandlers
-	};
+        RegisterEventHandlers: registerEventHandlers
+    };
 }());
 
 on('ready', function() {
