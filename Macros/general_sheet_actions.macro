@@ -1,3 +1,6 @@
+# PCs
+
+## Saves
 %{selected|Strength_Save}
 %{selected|Dexterity_Save}
 %{selected|Constitution_Save}
@@ -5,7 +8,10 @@
 %{selected|Wisdom_Save}
 %{selected|Charisma_Save}
 
+## Death Save
+%{selected|Death_Saving_Throw}
 
+## Standard Skills
 %{selected|Acrobatics_Check}
 %{selected|AnimalHandling_Check}
 %{selected|Arcana_Check}
@@ -25,11 +31,13 @@
 %{selected|Stealth_Check}
 %{selected|Survival_Check}
 
+## Custom Skills
 %{selected|Custom_Skill_1}
 %{selected|Custom_Skill_2}
 %{selected|Custom_Skill_3}
 %{selected|Custom_Skill_4}
 
+## Untrained Skills
 %{selected|Basic_Strength_Check}
 %{selected|Basic_Dexterity_Check}
 %{selected|Basic_Constitution_Check}
@@ -37,9 +45,53 @@
 %{selected|Basic_Wisdom_Check}
 %{selected|Basic_Charisma_Check}
 
+## Initiative
 %{selected|Initiative}
 
-%{selected|Death_Saving_Throw}
-
+## Basic Attacks
 %{selected|MeleeAttack1}
 %{selected|RangedAttack1}
+
+# NPCs
+
+## Saves
+%{selected|NPC_Strength_Save}
+%{selected|NPC_Dexterity_Save}
+%{selected|NPC_Constitution_Save}
+%{selected|NPC_Intelligence_Save}
+%{selected|NPC_Wisdom_Save}
+%{selected|NPC_Charisma_Save}
+
+## Standard Skills
+%{selected|NPC_Acrobatics_Check}
+%{selected|NPC_AnimalHandling_Check}
+%{selected|NPC_Arcana_Check}
+%{selected|NPC_Athletics_Check}
+%{selected|NPC_Deception_Check}
+%{selected|NPC_History_Check}
+%{selected|NPC_Insight_Check}
+%{selected|NPC_Intimidation_Check}
+%{selected|NPC_Investigation_Check}
+%{selected|NPC_Medicine_Check}
+%{selected|NPC_Nature_Check}
+%{selected|NPC_Perception_Check}
+%{selected|NPC_Performance_Check}
+%{selected|NPC_Persuasion_Check}
+%{selected|NPC_Religion_Check}
+%{selected|NPC_SleightOfHand_Check}
+%{selected|NPC_Stealth_Check}
+%{selected|NPC_Survival_Check}
+
+## Untrained Skills
+%{selected|NPC_Basic_Strength_Check}
+%{selected|NPC_Basic_Dexterity_Check}
+%{selected|NPC_Basic_Constitution_Check}
+%{selected|NPC_Basic_Intelligence_Check}
+%{selected|NPC_Basic_Wisdom_Check}
+%{selected|NPC_Basic_Charisma_Check}
+
+## Initiative
+%{selected|NPC_Initiative}
+
+## Basic Actions 1-20
+%{selected|NPCAction1}
