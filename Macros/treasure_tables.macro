@@ -1,0 +1,20 @@
+# Gemstones
+/w gm **Gemstone 10 GP:** [[1t[gemstones-10gp]]]
+/w gm **Gemstone 50 GP:** [[1t[gemstones-50gp]]]
+/w gm **Gemstone 100 GP:** [[1t[gemstones-100gp]]]
+/w gm **Gemstone 500 GP:** [[1t[gemstones-500gp]]]
+/w gm **Gemstone 1000 GP:** [[1t[gemstones-1000gp]]]
+/w gm **Gemstone 5000 GP:** [[1t[gemstones-5000gp]]]
+
+/w gm &{template:default} {{name=Gemstones}} {{10 gp=[Roll](!&#13;#gemstones-10gp)}} {{50 gp=[Roll](!&#13;#gemstones-50gp)}} {{100 gp=[Roll](!&#13;#gemstones-100gp)}} {{500 gp=[Roll](!&#13;#gemstones-500gp)}} {{1000 gp=[Roll](!&#13;#gemstones-1000gp)}} {{5000 gp=[Roll](!&#13;#gemstones-5000gp)}}
+
+# Individual treasures
+/w gm &{template:default} {{name=Individual Treasures}} {{CR 0-4=[Roll](!&#13;#treasure-individual-a)}} {{CR 5-10=[Roll](!&#13;#treasure-individual-b)}} {{CR 11-16=[Roll](!&#13;#treasure-individual-b)}} {{CR 17+=[Roll](!&#13;#treasure-individual-b)}}
+
+/w gm &{template:default} {{name=Individual Treasure CR 0-4}} {{result=[[1d100]]}} {{01-30=[[5d6]] cp}} {{31-60=[[4d6]] sp}} {{61-70=[[3d6]] ep}} {{71-95=[[3d6]] gp}} {{96-00=[[1d6]] pp}}
+
+/w gm &{template:default} {{name=Individual Treasure CR 5-10}} {{result=[[1d100]]}} {{01-30=[[4d6*100]] cp, [[1d6*10]] ep}} {{31-60=[[6d6*10]] sp, [[2d6*10]] gp}} {{61-70=[[3d6*10]] ep, [[2d6*10]] gp}} {{71-95=[[4d6*10]] gp}} {{96-00=[[2d6*10]] gp, [[3d6]] pp}}
+
+/w gm &{template:default} {{name=Individual Treasure CR 11-16}} {{result=[[1d100]]}} {{01-20=[[4d6*100]] sp, [[1d6*100]] gp}} {{21-35=[[1d6*100]] ep, [[1d6*100]] gp}} {{36-75=[[2d6*100]] gp, [[1d6*10]] pp}} {{76-00=[[2d6*100]] gp, [[2d6*10]] pp}} 
+
+/w gm &{template:default} {{name=Individual Treasure CR 17+}} {{result=[[1d100]]}} {{01-15=[[2d6*1000]] ep, [[8d6*100]] gp}} {{16-55=[[1d6*1000]] gp, [[1d6*100]] pp}} {{55-00=[[1d6*1000]] gp, [[2d6*100]] pp}}
