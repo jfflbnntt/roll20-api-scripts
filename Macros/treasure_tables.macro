@@ -1,3 +1,6 @@
+# Treasure tables
+/w gm &{template:default} {{name=Treasure Tables}} {{[Gemstones](!&#13;#treasure-gemstones) [Individual](!&#13;#treasure-individual)}}
+
 # Gemstones
 /w gm **Gemstone 10 GP:** [[1t[gemstones-10gp]]]
 /w gm **Gemstone 50 GP:** [[1t[gemstones-50gp]]]
