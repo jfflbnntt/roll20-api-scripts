@@ -12,4 +12,4 @@
 /desc @{selected|race}
 
 # NPC combined
-/w gm &{template:default} {{name=@{selected|character_name} Options}} {{[Actions](!&#13;#NPC-Actions) [Details](!&#13;#NPC-Details) [Description](!&#13;#NPC-Description) [Initiative](!&#13;#NPC-Initiative) [Saving Throw](!&#13;#NPC-Saving-Throw) [Skill Check](!&#13;#NPC-Skill-Check) [Roll Hit Dice](!&#13;#NPC-Hit-Dice)}}
+/w gm &{template:default} {{name=NPC Options}} {{[Actions](!&#13;#NPC-Actions) [Details](!&#13;#NPC-Details) [Description](!&#13;#NPC-Description) [Initiative](!&#13;#NPC-Initiative) [Saving Throw](!&#13;#NPC-Saving-Throw) [Skill Check](!&#13;#NPC-Skill-Check) [Roll Hit Dice](!&#13;#NPC-Hit-Dice)}}
