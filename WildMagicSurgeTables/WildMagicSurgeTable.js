@@ -3,7 +3,7 @@
 var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
     'use strict';
 
-    var version = 0.1,
+    var version = 0.2,
         rangeMax = 100,
         apiCommand = "!wildmagic",
         helpMsg = "Usage - !wildmagic [--help|-h] [--private|-w], rolls on the wildmagic table, optionally whispers result to roller if --private is used. '--help' will return this message.",
@@ -83,21 +83,25 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
     },
 
     handleInput = function(msg) {
-        var args;
+        var args,
+            option,
+            isPrivate = false;
+
         if(msg.type !== "api") {
             return;
         }
         args = msg.content.split(/\s+/);
-        switch(args[0]) {
-            case apiCommand:
-                if (args[0] == "--help" || args[0] == "-h")
-                    sendChat(tableName, helpMsg);
-                else {
-                    var isPrivate = false;
-                    if(args[0] == "--private" || args[0] == "-w")
-                        isPrivate = true;
-                    writeResult(msg, rollOnTable(), isPrivate);                    
-                }
+        if(args.length > 0 && args[0] == apiCommand) {
+            if(args.length > 1)
+                option = args[1]
+            if (option == "--help" || option == "-h") {
+                sendChat(tableName, helpMsg);
+                return;
+            }
+            if(option == "--private" || option == "-w") {
+                isPrivate = true;
+            }
+            writeResult(msg, rollOnTable(), isPrivate);
         }
     },
 
