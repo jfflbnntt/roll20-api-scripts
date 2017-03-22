@@ -72,32 +72,32 @@ var SpeechBalloon = SpeechBalloon || (function(){
         } 
 
         if(! bubbleBorder) {
-            bubbleBorder = fixNewObject(createObj("graphic", _.defaults({
+            bubbleBorder = createObj("graphic", _.defaults({
                 imgsrc: bubbleBorderSrc
-            },creationDefaults)));
+            },creationDefaults));
         }
 
         if(! bubbleTail) {
-            bubbleTail = fixNewObject(createObj("graphic", _.defaults({
+            bubbleTail = createObj("graphic", _.defaults({
                 width: 140,
                 height: 140,
                 imgsrc: bubbleTailSrc
-            },creationDefaults)));            
+            },creationDefaults));            
         }
 
         if(! bubbleFill ) {
-            bubbleFill = fixNewObject(createObj("graphic", _.defaults({
+            bubbleFill = createObj("graphic", _.defaults({
                 imgsrc: bubbleFillSrc
-            },creationDefaults)));            
+            },creationDefaults));            
         }
 
         if(! bubbleText ) {
-            bubbleText = fixNewObject(createObj("text", _.defaults({
+            bubbleText = createObj("text", _.defaults({
                 text: "DoubleBubbleBumBubblesDouble",
                 font_size: 16,
                 color: "rgb(0,0,0)",
                 font_family: fontFamily
-            },creationDefaults)));            
+            },creationDefaults));            
         }
 
         return {
@@ -106,13 +106,6 @@ var SpeechBalloon = SpeechBalloon || (function(){
             bubbleFill: bubbleFill,
             bubbleText: bubbleText,
         };
-    },
-
-    fixNewObject = function(obj) {
-        var p = obj.changed._fbpath,
-            new_p = p.replace(/([^\/]*\/){4}/, "/");
-        obj.fbpath = new_p;
-        return obj;
     },
 
     speechBalloon = function(nextBubble) {
