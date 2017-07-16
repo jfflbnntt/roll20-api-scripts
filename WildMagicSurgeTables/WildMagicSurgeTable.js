@@ -3,10 +3,10 @@
 var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
     'use strict';
 
-    var version = 0.2,
+    var version = 0.3,
         rangeMax = 100,
         apiCommand = "!wildmagic",
-        helpMsg = "Usage - !wildmagic [--help|-h] [--private|-w], rolls on the wildmagic table, optionally whispers result to roller if --private is used. '--help' will return this message.",
+        helpMsg = "Usage - !wildmagic [--help|-h] [--private|-w [whisperTo]], rolls on the wildmagic table, optionally whispers result to roller if --private is used or <whisperTo> if present i.e. (-w gm will send the results to the GM as a whisper). '--help' will return this message.",
         tableName = "Wild Magic Table",
         msgTemplate = "&{template:default} {{name=Wild Magic Surge}} {{roll=!roll}} {{result=!result}}",
         table = [
@@ -62,12 +62,15 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
             {range: [99,100], result: "You regain all expended Sorcery Points!"},
          ],
 
-    writeResult = function(msg, rollResult, isPrivate) {
+    writeResult = function(msg, rollResult, isPrivate, whisperTo) {
         var message = msgTemplate.replace('!roll', rollResult.roll).replace('!result', rollResult.result)
         var speakingAs = msg.who || tableName;
         if(isPrivate){
-            message = "/w "+msg.who+" "+message;
-            speakingAs = tableName;
+            var target = whisperTo || msg.who;
+            message = "/w "+target+" "+message;
+            if (target == speakingAs) {
+                speakingAs = tableName;
+            }
         }
         sendChat(speakingAs, message);
     },
@@ -85,7 +88,8 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
     handleInput = function(msg) {
         var args,
             option,
-            isPrivate = false;
+            isPrivate = false,
+            whisperTo = null;
 
         if(msg.type !== "api") {
             return;
@@ -100,8 +104,11 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
             }
             if(option == "--private" || option == "-w") {
                 isPrivate = true;
+                if (args.length > 2) {
+                    whisperTo = args[2];
+                }
             }
-            writeResult(msg, rollOnTable(), isPrivate);
+            writeResult(msg, rollOnTable(), isPrivate, whisperTo);
         }
     },
 
