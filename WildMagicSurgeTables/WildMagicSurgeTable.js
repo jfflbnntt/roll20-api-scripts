@@ -3,7 +3,7 @@
 var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
     'use strict';
 
-    var version = 0.4,
+    var version = 0.5,
         rangeMax = 100,
         apiCommand = "!wildmagic",
         helpMsg = "Usage - !wildmagic [--help|-h] [--private|-w [whisperTo]], rolls on the wildmagic table, optionally whispers result to roller if --private is used or <whisperTo> if present i.e. (-w gm will send the results to the GM as a whisper). '--help' will return this message.",
@@ -70,6 +70,7 @@ var WildMagicSurgeTable = WildMagicSurgeTable || (function() {
                 sendChat(speakingAs, "/w "+whisperTo+" "+message);                
             }
             message = "/w "+msg.who+" "+message;
+            speakingAs = tableName;
         }
         sendChat(speakingAs, message);
     },
