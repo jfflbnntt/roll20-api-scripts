@@ -5,129 +5,146 @@ var Herbalism = Herbalism || (function() {
     'use strict';
 
     //config values
-    var version = 0.3,
+    var version = 0.4,
         helpMsg = "Usage: [!herbalism|!herbs] [--help|-h] [--private|-w] [terrain], where [terrain] can be any of common, arctic, coastal, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper.",
         tableName = "Herbalism Table",
         msgFormat = "&{template:default} {{name=Herbalism}} {{terrain=!terrain}} {{roll=!roll}} {{ingredient=!ingredient}} {{amount=!amount}}",
         // rules state chance of special roll is 75-100 on a d100 if 2d6 comes up 2,3,4,10,11,12. This is roughly a 1-9 on a d100 overall chance.
         chanceOfSpecial = 9,
-        amountMax = 4,
+        // settings for various amounts
+        specialMax = 1,
+        rareMax = 2,
+        uncommonMax = 3,
+        commonMax = 4,
         // change to false if you don't want to auto-roll common ingredients
         autoRollIfCommon = true,
         // change to true if you want to auto-reroll bloodgrass
         autoReRerollIfBloodgrass = false,
+        // Table Entries
+        // common ingredients
         commonTable = [
-            {range: [2,12], ingredient: "Mandrake Root"},
-            {range: [3,4], ingredient: "Quicksilver Lichen"},
-            {range: [5,6], ingredient: "Wild Sageroot"},
-            {range: [7], ingredient: "Bloodgrass", additionalRules: "Re-roll if not tracking provisions"},
-            {range: [8,9], ingredient: "Wyrmtongue Petals"},
-            {range: [10,11], ingredient: "Milkweed Seeds"}
+            {range: [2,12],     ingredient: "Mandrake Root"},
+            {range: [3,4],      ingredient: "Quicksilver Lichen"},
+            {range: [5,6],      ingredient: "Wild Sageroot"},
+            {range: [7],        ingredient: "Bloodgrass",           amount: commonMax,          additionalRules: "Re-roll if not tracking provisions"},
+            {range: [8,9],      ingredient: "Wyrmtongue Petals"},
+            {range: [10,11],    ingredient: "Milkweed Seeds"}
         ],
+        // arctic ingredients
         arcticTable = [
-            {range: [2], ingredient: "Silver Hibiscus"},
-            {range: [3], ingredient: "Mortflesh Powder"},
-            {range: [4], ingredient: "Ironwood Heart"},
-            {range: [5], ingredient: "Frozen Seedlings", additionalRules: "Find 2x the rolled amount"},
-            {range: [6,7,8], ingredient: "Common Ingredient", additionalRules: "Roll on Common Ingredient table"},
-            {range: [9], ingredient: "Arctic Creeper", additionalRules: "Find 2x the rolled amount"},
-            {range: [10], ingredient: "Fennel Silk"},
-            {range: [11], ingredient: "Fiend's Ivy"},
-            {range: [12], ingredient: "Void Root"}
+            {range: [2],        ingredient: "Silver Hibiscus",      amount: rareMax},
+            {range: [3],        ingredient: "Mortflesh Powder",     amount: uncommonMax},
+            {range: [4],        ingredient: "Ironwood Heart",       amount: uncommonMax},
+            {range: [5],        ingredient: "Frozen Seedlings",     amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [6,7,8],    ingredient: "Common Ingredient",    amount: commonMax,          additionalRules: "Roll on Common Ingredient table"},
+            {range: [9],        ingredient: "Arctic Creeper",       amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [10],       ingredient: "Fennel Silk",          amount: uncommonMax},
+            {range: [11],       ingredient: "Fiend's Ivy",          amount: uncommonMax},
+            {range: [12],       ingredient: "Void Root",            amount: rareMax}
         ],
+        // underwater ingredients
         underwaterTable = [
-            {range: [2], ingredient: "Hydrathistle", additionalRules: "Find 1-2x the rolled amount"},
-            {range: [3], ingredient: "Amanita Cap"},
-            {range: [4], ingredient: "Hyancinth Nectar"},
-            {range: [5], ingredient: "Chromus Slime", additionalRules: "Find 1-2x the rolled amount"},
-            {range: [6,7,8], ingredient: "Common Ingredient", additionalRules: "Roll on Common Ingredient table"},
-            {range: [9], ingredient: "Lavender Sprig", additionalRules: "Coastal Only"},
-            {range: [10], ingredient: "Blue Toadshade", additionalRules: "Coastal Only"},
-            {range: [11], ingredient: "Wrackwort Bulbs"},
-            {range: [12], ingredient: "Cosmos Glond", additionalRules: "Find 1-2x the rolled amount"}
+            {range: [2],        ingredient: "Hydrathistle",         amount: rareMax,            additionalRules: "Find 1-2x the rolled amount"},
+            {range: [3],        ingredient: "Amanita Cap",          amount: uncommonMax},
+            {range: [4],        ingredient: "Hyancinth Nectar",     amount: uncommonMax},
+            {range: [5],        ingredient: "Chromus Slime",        amount: uncommonMax,        additionalRules: "Find 1-2x the rolled amount"},
+            {range: [6,7,8],    ingredient: "Common Ingredient",    amount: commonMax,          additionalRules: "Roll on Common Ingredient table"},
+            {range: [9],        ingredient: "Lavender Sprig",       amount: uncommonMax,        additionalRules: "Coastal Only"},
+            {range: [10],       ingredient: "Blue Toadshade",       amount: uncommonMax,        additionalRules: "Coastal Only"},
+            {range: [11],       ingredient: "Wrackwort Bulbs",      amount: uncommonMax},
+            {range: [12],       ingredient: "Cosmos Glond",         amount: rareMax,            additionalRules: "Find 1-2x the rolled amount"}
         ],
+        // desert ingredients
         desertTable = [
-            {range: [2], ingredient: "Cosmos Glond"},
-            {range: [3], ingredient: "Arrow Root"},
-            {range: [4], ingredient: "Dried Ephedra"},
-            {range: [5], ingredient: "Cactus Juice", additionalRules: "Find 2x the rolled amount"},
-            {range: [6,7,8], ingredient: "Common Ingredient", additionalRules: "Roll on Common Ingredient table"},
-            {range: [9], ingredient: "Drakus Flower"},
-            {range: [10], ingredient: "Scillia Beans"},
-            {range: [11], ingredient: "Spineflower Berries"},
-            {range: [12], ingredient: "Voidroot", additionalRules: "Come with 1 Elemental Water"}
+            {range: [2],        ingredient: "Cosmos Glond",         amount: rareMax},
+            {range: [3],        ingredient: "Arrow Root",           amount: uncommonMax},
+            {range: [4],        ingredient: "Dried Ephedra",        amount: uncommonMax},
+            {range: [5],        ingredient: "Cactus Juice",         amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [6,7,8],    ingredient: "Common Ingredient",    amount: commonMax,          additionalRules: "Roll on Common Ingredient table"},
+            {range: [9],        ingredient: "Drakus Flower",        amount: uncommonMax},
+            {range: [10],       ingredient: "Scillia Beans",        amount: uncommonMax},
+            {range: [11],       ingredient: "Spineflower Berries",  amount: uncommonMax},
+            {range: [12],       ingredient: "Voidroot",             amount: rareMax,            additionalRules: "Come with 1 Elemental Water"}
         ],
+        // forest ingredients
         forestTable = [
-            {range: [2], ingredient: "Harrada Leaf"},
-            {range: [3], ingredient: "Nightshade Berries"},
-            {range: [4], ingredient: "Emetic Wax"},
-            {range: [5], ingredient: "Verdant Nettle"},
-            {range: [6,7,8], ingredient: "Common Ingredient", additionalRules: "Roll on Common Ingredient table"},
-            {range: [9], ingredient: "Arrow Root"},
-            {range: [10], ingredient: "Ironwood Heart"},
-            {range: [11], ingredient: "Blue Toadshade"},
-            {range: [12], ingredient: "Wisp Stalks", additionalRules: "Find 2x during Night, Re-roll during Day"}
+            {range: [2],        ingredient: "Harrada Leaf",         amount: rareMax},
+            {range: [3],        ingredient: "Nightshade Berries",   amount: uncommonMax},
+            {range: [4],        ingredient: "Emetic Wax",           amount: uncommonMax},
+            {range: [5],        ingredient: "Verdant Nettle",       amount: uncommonMax},
+            {range: [6,7,8],    ingredient: "Common Ingredient",    amount: commonMax,          additionalRules: "Roll on Common Ingredient table"},
+            {range: [9],        ingredient: "Arrow Root",           amount: uncommonMax},
+            {range: [10],       ingredient: "Ironwood Heart",       amount: uncommonMax},
+            {range: [11],       ingredient: "Blue Toadshade",       amount: uncommonMax},
+            {range: [12],       ingredient: "Wisp Stalks",          amount: rareMax,            additionalRules: "Find 2x during Night, Re-roll during Day"}
         ],
+        // grasslands ingredients
         grasslandsTable = [
-            {range: [2], ingredient: "Harrada Leaf"},
-            {range: [3], ingredient: "Drakus Flower"},
-            {range: [4], ingredient: "Lavender Sprig", additionalRules: "Find 2x the rolled amount"},
-            {range: [5], ingredient: "Arrow Root"},
-            {range: [6,7,8], ingredient: "Common Ingredient", additionalRules: "Roll on Common Ingredient table"},
-            {range: [9], ingredient: "Scillia Beans", additionalRules: "Find 2x the rolled amount"},
-            {range: [10], ingredient: "Cactus Juice"},
-            {range: [11], ingredient: "Tail Leaf"},
-            {range: [12], ingredient: "Hyancinth Nectar"}
+            {range: [2],        ingredient: "Harrada Leaf",         amount: rareMax},
+            {range: [3],        ingredient: "Drakus Flower",        amount: uncommonMax},
+            {range: [4],        ingredient: "Lavender Sprig",       amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [5],        ingredient: "Arrow Root",           amount: uncommonMax},
+            {range: [6,7,8],    ingredient: "Common Ingredient",    amount: commonMax,          additionalRules: "Roll on Common Ingredient table"},
+            {range: [9],        ingredient: "Scillia Beans",        amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [10],       ingredient: "Cactus Juice",         amount: uncommonMax},
+            {range: [11],       ingredient: "Tail Leaf",            amount: uncommonMax},
+            {range: [12],       ingredient: "Hyancinth Nectar",     amount: rareMax}
         ],
+        // hill ingredients
         hillsTable = [
-            {range: [2], ingredient: "Devil's Bloodleaf"},
-            {range: [3], ingredient: "Nightshade Berries"},
-            {range: [4], ingredient: "Tail Leaf", additionalRules: "Find 2x the rolled amount"},
-            {range: [5], ingredient: "Lavender Sprig"},
-            {range: [6,7,8], ingredient: "Common Ingredient", additionalRules: "Roll on Common Ingredient table"},
-            {range: [9], ingredient: "Ironwood Heart"},
-            {range: [10], ingredient: "Gengko Brush"},
-            {range: [11], ingredient: "Rock Vine", additionalRules: "Find 2x the rolled amount"},
-            {range: [12], ingredient: "Harrada Leaf"}
+            {range: [2],        ingredient: "Devil's Bloodleaf",    amount: rareMax},
+            {range: [3],        ingredient: "Nightshade Berries",   amount: uncommonMax},
+            {range: [4],        ingredient: "Tail Leaf",            amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [5],        ingredient: "Lavender Sprig",       amount: uncommonMax},
+            {range: [6,7,8],    ingredient: "Common Ingredient",    amount: commonMax,          additionalRules: "Roll on Common Ingredient table"},
+            {range: [9],        ingredient: "Ironwood Heart",       amount: uncommonMax},
+            {range: [10],       ingredient: "Gengko Brush",         amount: uncommonMax},
+            {range: [11],       ingredient: "Rock Vine",            amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [12],       ingredient: "Harrada Leaf",         amount: rareMax}
         ],
+        // mountain ingredients
         mountainTable = [
-            {range: [2], ingredient: "Basilisk's Breath"},
-            {range: [3], ingredient: "Frozen Seedlings", additionalRules: "Find 2x the rolled amount"},
-            {range: [4], ingredient: "Arctic Creeper", additionalRules: "Find 2x the rolled amount"},
-            {range: [5], ingredient: "Dried Ephedra"},
-            {range: [6,7,8], ingredient: "Common Ingredient", additionalRules: "Roll on Common Ingredient table"},
-            {range: [9], ingredient: "Drakus Flower"},
-            {range: [10], ingredient: "Luminous Cap Dust", additionalRules: "Find 2x the rolled amount in Caves"},
-            {range: [11], ingredient: "Rock Vine"},
-            {range: [12], ingredient: "Primordial Balm"}
+            {range: [2],        ingredient: "Basilisk's Breath",    amount: rareMax},
+            {range: [3],        ingredient: "Frozen Seedlings",     amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [4],        ingredient: "Arctic Creeper",       amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [5],        ingredient: "Dried Ephedra",        amount: uncommonMax},
+            {range: [6,7,8],    ingredient: "Common Ingredient",    amount: commonMax,          additionalRules: "Roll on Common Ingredient table"},
+            {range: [9],        ingredient: "Drakus Flower",        amount: uncommonMax},
+            {range: [10],       ingredient: "Luminous Cap Dust",    amount: uncommonMax,        additionalRules: "Find 2x the rolled amount in Caves"},
+            {range: [11],       ingredient: "Rock Vine",            amount: uncommonMax},
+            {range: [12],       ingredient: "Primordial Balm",      amount: rareMax}
         ],
+        // swamp ingredients
         swampTable = [
-            {range: [2], ingredient: "Devil's Bloodleaf"},
-            {range: [3], ingredient: "Spineflower Berries"},
-            {range: [4], ingredient: "Emetic Wax"},
-            {range: [5], ingredient: "Amanita Cap", additionalRules: "Find 2x the rolled amount"},
-            {range: [6,7,8], ingredient: "Common Ingredient", additionalRules: "Roll on Common Ingredient table"},
-            {range: [9], ingredient: "Blue Toadshade", additionalRules: "Find 2x the rolled amount"},
-            {range: [10], ingredient: "Wrackwort Bulbs"},
-            {range: [11], ingredient: "Hydrathistle", additionalRules: "Find 2x the rolled amount in rain"},
-            {range: [12], ingredient: "Primordial Balm"}
+            {range: [2],        ingredient: "Devil's Bloodleaf",    amount: rareMax},
+            {range: [3],        ingredient: "Spineflower Berries",  amount: uncommonMax},
+            {range: [4],        ingredient: "Emetic Wax",           amount: uncommonMax},
+            {range: [5],        ingredient: "Amanita Cap",          amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [6,7,8],    ingredient: "Common Ingredient",    amount: commonMax,          additionalRules: "Roll on Common Ingredient table"},
+            {range: [9],        ingredient: "Blue Toadshade",       amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [10],       ingredient: "Wrackwort Bulbs",      amount: uncommonMax},
+            {range: [11],       ingredient: "Hydrathistle",         amount: uncommonMax,        additionalRules: "Find 2x the rolled amount in rain"},
+            {range: [12],       ingredient: "Primordial Balm",      amount: rareMax}
         ],
+        // underdark ingredients
         underdarkTable = [
-            {range: [2], ingredient: "Primordial Balm", additionalRules: "Find 1-2x the rolled amount"},
-            {range: [3], ingredient: "Silver Hibiscus"},
-            {range: [4], ingredient: "Devil's Bloodleaf"},
-            {range: [5], ingredient: "Chromus Slime"},
-            {range: [6], ingredient: "Mortflesh Powder", additionalRules: "Find 2x the rolled amount"},
-            {range: [7], ingredient: "Fennel Silk"},
-            {range: [8], ingredient: "Fiend's Ivy"},
-            {range: [9], ingredient: "Gengko Brush"},
-            {range: [10], ingredient: "Luminous Cap Dust", additionalRules: "Find 2x the rolled amount"},
-            {range: [11], ingredient: "Radiant Synthseed"},
-            {range: [12], ingredient: "Wisp Stalks"}
+            {range: [2],        ingredient: "Primordial Balm",      amount: rareMax,            additionalRules: "Find 1-2x the rolled amount"},
+            {range: [3],        ingredient: "Silver Hibiscus",      amount: uncommonMax},
+            {range: [4],        ingredient: "Devil's Bloodleaf",    amount: uncommonMax},
+            {range: [5],        ingredient: "Chromus Slime",        amount: uncommonMax},
+            {range: [6],        ingredient: "Mortflesh Powder",     amount: commonMax,          additionalRules: "Find 2x the rolled amount"},
+            {range: [7],        ingredient: "Fennel Silk",          amount: commonMax},
+            {range: [8],        ingredient: "Fiend's Ivy",          amount: commonMax},
+            {range: [9],        ingredient: "Gengko Brush",         amount: uncommonMax},
+            {range: [10],       ingredient: "Luminous Cap Dust",    amount: uncommonMax,        additionalRules: "Find 2x the rolled amount"},
+            {range: [11],       ingredient: "Radiant Synthseed",    amount: uncommonMax},
+            {range: [12],       ingredient: "Wisp Stalks",          amount: rareMax}
         ],
+        // special ingredients
         specialTable = [
-            {range: [2,3,4,5,6,7,8,9,10,11,12], ingredient: "Elemental Water"}
+            {range: [2,3,4,5,6,7,8,9,10,11,12],     ingredient: "Elemental Water",      amount: specialMax}
         ],
+        // mapping between terrain name and ingredient tables
         terrainMap = {
             "common": commonTable,
             "arctic": arcticTable,
@@ -193,7 +210,7 @@ var Herbalism = Herbalism || (function() {
             return {
                 terrain: terrainName,
                 roll: roll,
-                amount: randomInteger(amountMax),
+                amount: randomInteger(entry.amount || commonMax),
                 ingredient: entry.ingredient,
                 additionalRules: entry.additionalRules
             };                        
