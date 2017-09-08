@@ -8,9 +8,15 @@ A random table generator for herbal ingredients based on the original content by
 [!herbalism|!herbs] [--help|-h] [--private|-w] [terrain], where [terrain] can be any of common, arctic, coastal, underwater, desert, forest, grasslands, hills, mountain, swamp, underdark, or special. If left blank 'common' will be used. '--help' will return this message. '--private' will return the result in a whisper."
 ```
 
+## Macro
+
+```
+!herbs ?{Choose a Terrain|common|arctic|coastal|desert|forest|grasslands|hills|mountain|swamp|underdark|underwater|special}
+```
+
 ## Changes
 
-**0.4**
+**v0.4**
 
 - added 'amount' to table entries which allows ingredients to occur in differing amounts
 - 'amount' is the *maximum* possible amount of the ingredient found
