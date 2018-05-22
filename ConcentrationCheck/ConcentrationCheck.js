@@ -3,10 +3,12 @@
 var ConcentrationModule = ConcentrationModule || (function() {
     'use strict';
 
-    var version = 0.1,
+    var version = 0.2,
         baseDC = 10,
         bar = "bar1",
         concentrationMarker = "stopwatch",
+        conCheckTemplate = "&{template:default} {{name=Concentration Check}} {{target=!target}} {{note=!note}} {{DC=!saveDC}}",
+        conLostTemplate = "&{template:default} {{name=Concentration Lost}} {{target=!target}} {{note=Target has lost Concentration!}}",
     
     checkInstall = function() {
         log('Concentration v'+version+' Ready');
@@ -28,18 +30,15 @@ var ConcentrationModule = ConcentrationModule || (function() {
             // remove concentration marker
             obj.set('status_' + concentrationMarker, false);
             // remind GM concentration is lost
-            var message =  obj.get("name") +" has lost concentration!";
+            var message =  conLostTemplate.replace("!target", obj.get("name"));
             sendChat("gm", message);            
         } else {
             var hpPrev = prev[bar+"_value"];
             var hpDiff = hpPrev - hpCurr;
             if(hpDiff > 0) {
                 var damageDC = Math.round(hpDiff / 2);
-                var concDC = damageDC;
-                if(damageDC < baseDC) {
-                    concDC = baseDC;
-                }
-                var message =  obj.get("name") +" needs to make a concentration check! CON save vs "+ concDC +".";
+                var concDC = Math.max(damageDC, baseDC);
+                var message = conCheckTemplate.replace("!target", obj.get("name")).replace("!note", "Target must make a Concentration check!").replace("!saveDC", concDC);
                 sendChat("gm", message);
             }
         }
