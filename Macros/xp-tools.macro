@@ -1,0 +1,2 @@
+# Macro with Macro buttons
+/w gm &{template:default} {{name=XP Tools}} {{[NPC](!&#13;#XP-npc )}} {{[Quest](!&#13;#XP-quest )}} {{[Session](!&#13;#XP-session )}} {{[Config](!&#13;#XP-config )}} {{[Help](!&#13;#XP-help )}}
