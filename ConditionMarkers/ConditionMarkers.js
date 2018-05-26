@@ -6,6 +6,14 @@ var ConditionMarkers = ConditionMarkers || (function() {
     
     var version = 0.2,
         conditionToStatusList = [
+            { condition: "red",             status: "red" },
+            { condition: "blue",            status: "blue" },
+            { condition: "green",           status: "green" },
+            { condition: "brown",           status: "brown" },
+            { condition: "purple",          status: "purple" },
+            { condition: "pink",            status: "pink" },
+            { condition: "yellow",          status: "yellow" },
+            { condition: "dead",            status: "dead" },
             { condition: "blessed",         status: "aura" },
             { condition: "blinded",         status: "bleeding-eye" },
             { condition: "charmed",         status: "chained-heart" },
