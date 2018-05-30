@@ -3,12 +3,34 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.0,
+    var version = 0.1,
+        unitTable = {
+            's': "second",
+            'm': "minute",
+            'h': "hour",
+            'd': "day",
+            'w': "week",
+            'M': "month",
+            'y': "year"
+        },
+        overflowTable = {
+            "second": "minute",
+            "minute": "hour",
+            "hour": "day",
+            "day": "week",
+            "week": "month",
+            "month": "year"
+        },
 
-    getCalendarProps = function() {
-        var calendar = findObjs({_type: "character", name: "Calendar"})[0];
-        props = findObjs({_type: "attribute", _characterid: calendar._id});
-        return props;
+    getCalendarId = function() {
+        var calendar = findObjs({type: "character", name: "Calendar"})[0],
+            calandarId = calendar.id;
+        return calandarId;
+    },
+
+    getAttr = function(objId, attrName) {
+        var attr = findObjs({type: "attribute", characterid: objId, name: attrName})[0];
+        return attr;
     },
 
     showHelp = function() {
@@ -16,51 +38,42 @@ var Calendar = Calendar || (function() {
         sendChat("", help);
     },
 
-    addTime = function(amount, unit) {
-        var unitProps = getCalendarProps();
-        var unitName, unitAttr, unitCurrent, unitMax, unitTotal, unitOverflow;
-        if(unit == "s" || unit == "sec" || unit == "second" || unit == "seconds") {
-            unitName = "second";
-            unitOverflow = "hour";
-        }
-        if(unit == "h" || unit == "hour" || unit == "hours") {
-            unitName = "hour";
-            unitOverflow = "day";
-        }
-        if(unit == "d" || unit == "day" || unit == "days") {
-            unitName = "day";
-            unitOverflow = "week";
-        }
-        if(unit == "w" || unit == "week" || unit == "weeks") {
-            unitName = "week";
-            unitOverflow = "month";
-        }
-        if(unit == "m" || unit == "month" || unit == "months") {
-            unitName = "month";
-            unitOverflow = "year";
-        }
-        if(unit == "y" || unit == "year" || unit == "years") {
-            unitName = "year";
+    addTime = function(unitInput, amountInput) {
+        var amount = parseInt(amountInput),
+            unitName = unitTable[unitInput.charAt(0)],
+            unitOverflow = overflowTable[unitName],
+            calendarId = getCalendarId(),
+            unitAttr = getAttr(calendarId, unitName),
+            current = parseInt(unitAttr.get("current")),
+            max = parseInt(unitAttr.get("max")),
+            total = current + amount, 
+            result = 0, 
+            overflowAmount = 0;
+
+        if(max > 0) {
+            result = total % max;
+            overflowAmount = Math.floor(total / max);
+        } else {
+            result = total;
         }
 
-        unitAttr = _.find(unitProps, function(p) { return p.name == unitName; });
-        unitCurrent = unitAttr.get("current");
-        unitMax = unitAttr.get("max");
-        unitTotal = unitCurrent + amount;
-        unitAttr.set("current", unitTotal);
+        unitAttr.set("current", result);
+
+        if (overflowAmount > 0 && unitOverflow != undefined) {
+            addTime(unitOverflow, overflowAmount);
+        }
     },
 
     processCalendarCommand = function(msg, command, args) {
         var arg1 = args.shift();
-        if(arg1 == undefined || arg1 == help) {
+
+        if(arg1.indexOf("+") == 0) {
+            var unit = arg1.substring(1),
+                amount = args.shift();
+            addTime(unit, amount);
+        } else {
             showHelp();
             return;
-        }
-
-        if(arg1 == "add" || "+") {
-            var amount = args.shift(),
-                timeType = args.shift();
-            addTime(amount, unit);
         }
     },
 
