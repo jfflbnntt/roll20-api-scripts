@@ -3,7 +3,7 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.2,
+    var version = 0.3,
         unitTable = {
             's': "second",
             'm': "minute",
@@ -22,10 +22,43 @@ var Calendar = Calendar || (function() {
             "month": "year"
         },
 
+    timeOfDay = function(calanderId) {
+        var hour = parseInt(getAttrByName(calanderId, "hour")),
+            minute = parseInt(getAttrByName(calanderId, "minute")),
+            second = parseInt(getAttrByName(calanderId, "second")),
+            useMilitaryTime = getAttrByName(calanderId, "militaryTime") == "true",
+            dayTime = "";
+
+        if(!useMilitaryTime) {
+            if(hour >= 12) {
+                dayTime = " pm";
+                if(hour >= 13) {
+                    hour = hour - 12;
+                }
+            } else {
+                dayTime = " am";
+                if(hour == 0) {
+                    hour = 12;
+                }
+            }
+        }
+        if(minute < 10) {
+            minute = "0"+minute;
+        }
+        if(second < 10) {
+            second = "0"+minute;
+        }
+        return hour+":"+minute+":"+second+dayTime;
+    },
+
+    showTimeOfDay = function(calanderId) {
+        sendChat("", "/desc The current time is "+timeOfDay(calanderId));
+    },
+
     getCalendarId = function() {
         var calendar = findObjs({type: "character", name: "Calendar"})[0],
-            calandarId = calendar.id;
-        return calandarId;
+            calanderId = calendar.id;
+        return calanderId;
     },
 
     getAttr = function(objId, attrName) {
@@ -38,38 +71,39 @@ var Calendar = Calendar || (function() {
         sendChat("", help);
     },
 
+    // set or add time (add negative to subtract)
     setTime = function(calendarId, unit, amount, addToCurrent) {
         var unitOverflow = overflowTable[unit],
             unitAttr = getAttr(calendarId, unit),
             current = parseInt(unitAttr.get("current")),
             max = parseInt(unitAttr.get("max")),
-            total = 0, 
             result = 0, 
             overflowAmount = 0;
 
+        // add or set check
         if(addToCurrent) {
-            total = current + amount;
+            result = current + amount;
         } else {
-            total = amount;
+            result = amount;
         }
 
+        // determine overflow amount if any
         if(max > 0) {
-            result = total % max;
-            overflowAmount = Math.trunc(total / max);
+            overflowAmount = Math.trunc(result / max);
+            result = result % max;
             // handle negatives
             if(result < 0) {
                 result +=  max;
                 overflowAmount -= 1;
             }
-        } else {
-            result = total;
+            // handle overflow amount if applicable
+            if (overflowAmount != 0 && unitOverflow != undefined) {
+                setTime(calendarId, unitOverflow, overflowAmount, true);
+            }
         }
 
+        // finally set result
         unitAttr.set("current", result);
-
-        if (overflowAmount != 0 && unitOverflow != undefined) {
-            setTime(calendarId, unitOverflow, overflowAmount, true);
-        }
     },
 
     processCalendarCommand = function(msg, command, args) {
@@ -88,7 +122,9 @@ var Calendar = Calendar || (function() {
         } else if (arg1 != undefined && arg1.length > 1 && arg1.indexOf("=") == 0) {
             var unit = unitTable[arg1.charAt(1)],
                 amount = parseInt(arg2);
-            setTime(calendarId, unit, amount, false);                
+            setTime(calendarId, unit, amount, false);  
+        } else if(arg1 == "time") {
+            showTimeOfDay(calendarId);          
         } else {
             showHelp();
         }
