@@ -46,7 +46,7 @@ var Calendar = Calendar || (function() {
             minute = "0"+minute;
         }
         if(second < 10) {
-            second = "0"+minute;
+            second = "0"+second;
         }
         return hour+":"+minute+":"+second+dayTime;
     },
