@@ -3,7 +3,7 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.4,
+    var version = 0.5,
         unitTable = {
             's': "second",
             'm': "minute",
@@ -22,26 +22,16 @@ var Calendar = Calendar || (function() {
             "month" : "year"
         },
 
-    formattedDate = function(calendarId) {
-        var year =  parseInt(getAttrByName(calendarId, "year")), 
-            month =  parseInt(getAttrByName(calendarId, "month")) + 1, 
-            week =  parseInt(getAttrByName(calendarId, "week")) + 1, 
-            day = parseInt(getAttrByName(calendarId, "day")) + 1;
-
-        return year+"/"+month+"/"+week+"/"+day;
-    },
-
-    showFormattedDate = function(calendarId) {
-        sendChat("", "/desc The current date is "+formattedDate(calendarId));
-
-    },
-
-    timeOfDay = function(calendarId) {
+    applyToPattern = function(calendarId, pattern) {
         var hour = parseInt(getAttrByName(calendarId, "hour")),
             minute = parseInt(getAttrByName(calendarId, "minute")),
             second = parseInt(getAttrByName(calendarId, "second")),
             useMilitaryTime = getAttrByName(calendarId, "militaryTime") == "true",
-            dayTime = "";
+            dayTime = "",
+            year =  parseInt(getAttrByName(calendarId, "year")), 
+            month =  parseInt(getAttrByName(calendarId, "month")) + 1, 
+            week =  parseInt(getAttrByName(calendarId, "week")) + 1, 
+            day = parseInt(getAttrByName(calendarId, "day")) + 1;
 
         if(!useMilitaryTime) {
             if(hour >= 12) {
@@ -62,11 +52,25 @@ var Calendar = Calendar || (function() {
         if(second < 10) {
             second = "0"+second;
         }
-        return hour+":"+minute+":"+second+dayTime;
+
+        return pattern
+            .replace("?t", dayTime)
+            .replace("?s", second)
+            .replace("?m", minute)
+            .replace("?h", hour)
+            .replace("?D", day)
+            .replace("?W", week)
+            .replace("?M", month)
+            .replace("?Y", year);
     },
 
-    showTimeOfDay = function(calendarId) {
-        sendChat("", "/desc The current time is "+timeOfDay(calendarId));
+    showDate = function(calendarId) {
+        sendChat("", applyToPattern(calendarId, "/desc The current date is ?D/?W/?M/?Y."));
+
+    },
+
+    showTime = function(calendarId) {
+        sendChat("", applyToPattern(calendarId, "/desc The current time is ?h:?m:?s?t."));
     },
 
     getCalendarId = function() {
@@ -138,9 +142,12 @@ var Calendar = Calendar || (function() {
                 amount = parseInt(arg2);
             setTime(calendarId, unit, amount, false);  
         } else if(arg1 == "time") {
-            showTimeOfDay(calendarId); 
-        } else if (arg1 = "date") {
-            showFormattedDate(calendarId);             
+            showTime(calendarId); 
+        } else if (arg1 == "date") {
+            showDate(calendarId);             
+        } else if (arg1 == "format") {
+            var pattern = [arg2].concat(args).join(" ");
+            sendChat("", applyToPattern(calendarId, pattern));
         } else {
             showHelp();
         }
