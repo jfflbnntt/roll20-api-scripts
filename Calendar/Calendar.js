@@ -3,7 +3,7 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.3,
+    var version = 0.4,
         unitTable = {
             's': "second",
             'm': "minute",
@@ -16,17 +16,31 @@ var Calendar = Calendar || (function() {
         overflowTable = {
             "second": "minute",
             "minute": "hour",
-            "hour": "day",
-            "day": "week",
-            "week": "month",
-            "month": "year"
+            "hour"  : "day",
+            "day"   : "week",
+            "week"  : "month",
+            "month" : "year"
         },
 
-    timeOfDay = function(calanderId) {
-        var hour = parseInt(getAttrByName(calanderId, "hour")),
-            minute = parseInt(getAttrByName(calanderId, "minute")),
-            second = parseInt(getAttrByName(calanderId, "second")),
-            useMilitaryTime = getAttrByName(calanderId, "militaryTime") == "true",
+    formattedDate = function(calendarId) {
+        var year =  parseInt(getAttrByName(calendarId, "year")), 
+            month =  parseInt(getAttrByName(calendarId, "month")) + 1, 
+            week =  parseInt(getAttrByName(calendarId, "week")) + 1, 
+            day = parseInt(getAttrByName(calendarId, "day")) + 1;
+
+        return year+"/"+month+"/"+week+"/"+day;
+    },
+
+    showFormattedDate = function(calendarId) {
+        sendChat("", "/desc The current date is "+formattedDate(calendarId));
+
+    },
+
+    timeOfDay = function(calendarId) {
+        var hour = parseInt(getAttrByName(calendarId, "hour")),
+            minute = parseInt(getAttrByName(calendarId, "minute")),
+            second = parseInt(getAttrByName(calendarId, "second")),
+            useMilitaryTime = getAttrByName(calendarId, "militaryTime") == "true",
             dayTime = "";
 
         if(!useMilitaryTime) {
@@ -51,14 +65,14 @@ var Calendar = Calendar || (function() {
         return hour+":"+minute+":"+second+dayTime;
     },
 
-    showTimeOfDay = function(calanderId) {
-        sendChat("", "/desc The current time is "+timeOfDay(calanderId));
+    showTimeOfDay = function(calendarId) {
+        sendChat("", "/desc The current time is "+timeOfDay(calendarId));
     },
 
     getCalendarId = function() {
         var calendar = findObjs({type: "character", name: "Calendar"})[0],
-            calanderId = calendar.id;
-        return calanderId;
+            calendarId = calendar.id;
+        return calendarId;
     },
 
     getAttr = function(objId, attrName) {
@@ -124,7 +138,9 @@ var Calendar = Calendar || (function() {
                 amount = parseInt(arg2);
             setTime(calendarId, unit, amount, false);  
         } else if(arg1 == "time") {
-            showTimeOfDay(calendarId);          
+            showTimeOfDay(calendarId); 
+        } else if (arg1 = "date") {
+            showFormattedDate(calendarId);             
         } else {
             showHelp();
         }
