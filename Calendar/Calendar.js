@@ -3,7 +3,8 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.5,
+    var version = 0.6,
+        helpMessage = "Calendar Help: TODO",
         unitTable = {
             's': "second",
             'm': "minute",
@@ -21,17 +22,26 @@ var Calendar = Calendar || (function() {
             "week"  : "month",
             "month" : "year"
         },
+        defaultMax = {
+            "second": 60,
+            "minute": 60,
+            "hour"  : 24,
+            "day"   : 10,
+            "week"  : 3,
+            "month" : 12,
+            "year"  : 0
+        },
 
     applyToPattern = function(calendarId, pattern) {
-        var hour = parseInt(getAttrByName(calendarId, "hour")),
-            minute = parseInt(getAttrByName(calendarId, "minute")),
-            second = parseInt(getAttrByName(calendarId, "second")),
-            useMilitaryTime = getAttrByName(calendarId, "militaryTime") == "true",
+        var hour = parseInt(getAttr(calendarId, "hour").get("current")),
+            minute = parseInt(getAttr(calendarId, "minute").get("current")),
+            second = parseInt(getAttr(calendarId, "second").get("current")),
+            useMilitaryTime = getAttr(calendarId, "militaryTime").get("current") == "true",
             dayTime = "",
-            year =  parseInt(getAttrByName(calendarId, "year")), 
-            month =  parseInt(getAttrByName(calendarId, "month")) + 1, 
-            week =  parseInt(getAttrByName(calendarId, "week")) + 1, 
-            day = parseInt(getAttrByName(calendarId, "day")) + 1;
+            year =  parseInt(getAttr(calendarId, "year").get("current")), 
+            month =  parseInt(getAttr(calendarId, "month").get("current")) + 1, 
+            week =  parseInt(getAttr(calendarId, "week").get("current")) + 1, 
+            day = parseInt(getAttr(calendarId, "day").get("current")) + 1;
 
         if(!useMilitaryTime) {
             if(hour >= 12) {
@@ -74,18 +84,28 @@ var Calendar = Calendar || (function() {
     },
 
     getCalendarId = function() {
-        var calendar = findObjs({type: "character", name: "Calendar"})[0],
-            calendarId = calendar.id;
-        return calendarId;
+        var calendar = findObjs({type: "character", name: "Calendar"})[0];
+        if(calendar == undefined) {
+            createObj("character", {name: "Calendar"});
+            calendar = findObjs({type: "character", name: "Calendar"})[0];
+        }
+        return calendar.id;
     },
 
-    getAttr = function(objId, attrName) {
-        var attr = findObjs({type: "attribute", characterid: objId, name: attrName})[0];
+    getAttr = function(calendarId, attrName) {
+        var attr = findObjs({type: "attribute", characterid: calendarId, name: attrName})[0];
+        if(attr == undefined) {
+            createObj("attribute", {characterid: calendarId, name: attrName, current: 0});
+            attr = findObjs({type: "attribute", characterid: calendarId, name: attrName})[0];
+            if(defaultMax[attrName] != undefined) {
+                attr.set("max", defaultMax[attrName]);
+            }
+        }
         return attr;
     },
 
     showHelp = function() {
-        var help = "/w gm calendar help!";
+        var help = "/w gm " + helpMessage;
         sendChat("", help);
     },
 
