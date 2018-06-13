@@ -3,8 +3,8 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.6,
-        helpMessage = "Calendar Help: TODO",
+    var version = 0.7,
+        helpMessage = "Calendar Help: see doc at https://github.com/jfflbnntt/roll20-api-scripts/blob/master/Calendar/Calendar.md",
         unitTable = {
             's': "second",
             'm': "minute",
@@ -31,6 +31,8 @@ var Calendar = Calendar || (function() {
             "month" : 12,
             "year"  : 0
         },
+        defaultTimeFormat = "?h:?m:?s?t",
+        defaultDateFormat = "?D/?W/?M/?Y",
 
     applyToPattern = function(calendarId, pattern) {
         var hour = parseInt(getAttr(calendarId, "hour").get("current")),
@@ -75,12 +77,19 @@ var Calendar = Calendar || (function() {
     },
 
     showDate = function(calendarId) {
-        sendChat("", applyToPattern(calendarId, "/desc The current date is ?D/?W/?M/?Y."));
-
+        var dateFormat = getAttrByName(calendarId, "dateFormat");
+        if(dateFormat == undefined) {
+            dateFormat = defaultDateFormat;
+        }
+        sendChat("", applyToPattern(calendarId, "/desc The current date is "+dateFormat+"."));
     },
 
     showTime = function(calendarId) {
-        sendChat("", applyToPattern(calendarId, "/desc The current time is ?h:?m:?s?t."));
+        var timeFormat = getAttrByName(calendarId, "timeFormat");
+        if(timeFormat == undefined) {
+            timeFormat = defaultTimeFormat;
+        }
+        sendChat("", applyToPattern(calendarId, "/desc The current time is "+timeFormat+"."));
     },
 
     getCalendarId = function() {
