@@ -3,7 +3,7 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.7,
+    var version = 0.8,
         helpMessage = "Calendar Help: see doc at https://github.com/jfflbnntt/roll20-api-scripts/blob/master/Calendar/Calendar.md",
         unitTable = {
             's': "second",
@@ -26,13 +26,38 @@ var Calendar = Calendar || (function() {
             "second": 60,
             "minute": 60,
             "hour"  : 24,
-            "day"   : 10,
-            "week"  : 3,
-            "month" : 12,
+            "day"   : 7,
+            "week"  : 4,
+            "month" : 13,
             "year"  : 0
         },
+        monthNames = [
+            "Loviatar",
+            "Umberlee",
+            "Bahamut",
+            "Gond",
+            "Tymora",
+            "Beshaba",
+            "Helm",
+            "Waukeen",
+            "Tiamat",
+            "Mielikki",
+            "Mask",
+            "Auril",
+            "Ilmater"
+        ],
+        dayNames = [
+            "Morndas",
+            "Tordas",
+            "Windas",
+            "Thurdas",
+            "Fredas",
+            "Loredas",
+            "Sundas"
+        ],
         defaultTimeFormat = "?h:?m:?s?t",
-        defaultDateFormat = "?D/?W/?M/?Y",
+        defaultDateFormat = "?DoM/?M/?Y",
+        defaultFullFormat = defaultTimeFormat+" on ?DoW ?DoM of ?MoY, ?Y",
 
     applyToPattern = function(calendarId, pattern) {
         var hour = parseInt(getAttr(calendarId, "hour").get("current")),
@@ -43,7 +68,10 @@ var Calendar = Calendar || (function() {
             year =  parseInt(getAttr(calendarId, "year").get("current")), 
             month =  parseInt(getAttr(calendarId, "month").get("current")) + 1, 
             week =  parseInt(getAttr(calendarId, "week").get("current")) + 1, 
-            day = parseInt(getAttr(calendarId, "day").get("current")) + 1;
+            day = parseInt(getAttr(calendarId, "day").get("current")) + 1,
+            dayOfMonth = (parseInt(getAttr(calendarId, "day").get("max")) * (week - 1)) + day,
+            monthName = monthNames[month - 1],
+            dayOfWeek = dayNames[day - 1];
 
         if(!useMilitaryTime) {
             if(hour >= 12) {
@@ -70,26 +98,52 @@ var Calendar = Calendar || (function() {
             .replace("?s", second)
             .replace("?m", minute)
             .replace("?h", hour)
+            .replace("?DoM", dayOfMonth)
+            .replace("?DoW", dayOfWeek)
             .replace("?D", day)
             .replace("?W", week)
+            .replace("?MoY", monthName)
             .replace("?M", month)
             .replace("?Y", year);
     },
 
-    showDate = function(calendarId) {
-        var dateFormat = getAttrByName(calendarId, "dateFormat");
+    showDate = function(calendarId, isWhisper) {
+        var dateFormat = getAttrByName(calendarId, "dateFormat"),
+            chatType = "/desc";
+
+        if(isWhisper == true) {
+            chatType = "/w GM";
+        }
         if(dateFormat == undefined) {
             dateFormat = defaultDateFormat;
         }
-        sendChat("", applyToPattern(calendarId, "/desc The current date is "+dateFormat+"."));
+        sendChat("", applyToPattern(calendarId, chatType+" The current date is "+dateFormat+"."));
     },
 
-    showTime = function(calendarId) {
-        var timeFormat = getAttrByName(calendarId, "timeFormat");
+    showTime = function(calendarId, isWhisper) {
+        var timeFormat = getAttrByName(calendarId, "timeFormat"),
+            chatType = "/desc";
+
+        if(isWhisper == true) {
+            chatType = "/w GM";
+        }
         if(timeFormat == undefined) {
             timeFormat = defaultTimeFormat;
         }
-        sendChat("", applyToPattern(calendarId, "/desc The current time is "+timeFormat+"."));
+        sendChat("", applyToPattern(calendarId, chatType+" The current time is "+timeFormat+"."));
+    },
+
+    showFull = function(calendarId, isWhisper) {
+        var fullFormat = getAttrByName(calendarId, "fullFormat"),
+            chatType = "/desc";
+
+        if(isWhisper == true) {
+            chatType = "/w GM";
+        }
+        if(fullFormat == undefined) {
+            fullFormat = defaultFullFormat;
+        }
+        sendChat("", applyToPattern(calendarId, chatType+" "+fullFormat+"."));
     },
 
     getCalendarId = function() {
@@ -115,7 +169,7 @@ var Calendar = Calendar || (function() {
 
     showHelp = function() {
         var help = "/w gm " + helpMessage;
-        sendChat("", help);
+        sendChat("Calendar", help);
     },
 
     // set or add time (add negative to subtract)
@@ -151,6 +205,7 @@ var Calendar = Calendar || (function() {
 
         // finally set result
         unitAttr.set("current", result);
+        showFull(calendarId, true);
     },
 
     processCalendarCommand = function(msg, command, args) {
@@ -174,6 +229,8 @@ var Calendar = Calendar || (function() {
             showTime(calendarId); 
         } else if (arg1 == "date") {
             showDate(calendarId);             
+        } else if (arg1 == "full") {
+            showFull(calendarId);             
         } else if (arg1 == "format") {
             var pattern = [arg2].concat(args).join(" ");
             sendChat("", applyToPattern(calendarId, pattern));
