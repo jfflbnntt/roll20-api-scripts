@@ -3,7 +3,7 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.9,
+    var version = 0.10,
         helpMessage = "Calendar Help: see doc at https://github.com/jfflbnntt/roll20-api-scripts/blob/master/Calendar/Calendar.md",
         unitTable = {
             's': "second",
@@ -32,19 +32,19 @@ var Calendar = Calendar || (function() {
             "year"  : 0
         },
         monthNames = [
-            "Umberlee (Galehome)",
-            "Bahamut (The Bloom)",
-            "Beshaba (Drawblade)",
-            "Tymora (Magus Birth)",
-            "Gond (Wealwind)",
-            "Helm (The Blaze)",
-            "Waukeen (Starfall)",
-            "Mielikki (The Reap)",
-            "Tiamat (Cofferfill)",
+            "Talos (Galehome)",
+            "Silvanus (The Bloom)",
+            "Tempus (Drawblade)",
+            "Savras (Magus Birth)",
+            "Tyr (Wealwind)",
+            "Gond (The Blaze)",
+            "Selune (Starfall)",
+            "Chauntea (The Reap)",
+            "Waukeen (Cofferfill)",
             "Mask (Emberfade)",
-            "Auril (The Rime)",
-            "Ilmater (Hardfrost)",
-            "Loviatar (The Shroud)"
+            "Shar (The Rime)",
+            "Auril (Hardfrost)",
+            "Myrkul (The Shroud)"
         ],
         dayNames = [
             "Morndas (Moon day)",
