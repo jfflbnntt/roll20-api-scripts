@@ -3,7 +3,7 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.10,
+    var version = 0.11,
         helpMessage = "Calendar Help: see doc at https://github.com/jfflbnntt/roll20-api-scripts/blob/master/Calendar/Calendar.md",
         unitTable = {
             's': "second",
@@ -38,7 +38,7 @@ var Calendar = Calendar || (function() {
             "Savras (Magus Birth)",
             "Tyr (Wealwind)",
             "Gond (The Blaze)",
-            "Selune (Starfall)",
+            "Tymora (Starfall)",
             "Chauntea (The Reap)",
             "Waukeen (Cofferfill)",
             "Mask (Emberfade)",
