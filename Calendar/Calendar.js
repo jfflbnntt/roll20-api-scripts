@@ -3,7 +3,7 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.11,
+    var version = 0.12,
         helpMessage = "Calendar Help: see doc at https://github.com/jfflbnntt/roll20-api-scripts/blob/master/Calendar/Calendar.md",
         unitTable = {
             's': "second",
@@ -32,28 +32,28 @@ var Calendar = Calendar || (function() {
             "year"  : 0
         },
         monthNames = [
-            "Talos (Galehome)",
-            "Silvanus (The Bloom)",
-            "Tempus (Drawblade)",
-            "Savras (Magus Birth)",
-            "Tyr (Wealwind)",
-            "Gond (The Blaze)",
-            "Tymora (Starfall)",
-            "Chauntea (The Reap)",
-            "Waukeen (Cofferfill)",
-            "Mask (Emberfade)",
-            "Shar (The Rime)",
-            "Auril (Hardfrost)",
-            "Myrkul (The Shroud)"
+            "Olidammara 'Galehome'",
+            "Ehlonna 'The Bloom'",
+            "Kord 'Drawblade'",
+            "Ioun 'Magus Birth'",
+            "Heironeous 'Wealwind'",
+            "Pelor 'The Blaze'",
+            "Avandra 'Starfall'",
+            "Yondalla 'The Reap'",
+            "Waukeen 'Cofferfill'",
+            "Sehanine 'Emberfade'",
+            "Eldath 'The Rime'",
+            "Auril 'Hardfrost'",
+            "Kelemvor 'The Shroud'"
         ],
         dayNames = [
+            "Sundas (Sun day)",
             "Morndas (Moon day)",
             "Tirdas (Toil day)",
             "Windas (Winds day)",
             "Thordas (Lore day)",
             "Fredas (Free day)",
-            "Stardas (Gods day)",
-            "Sundas (Sun day)"
+            "Stardas (Gods day)"
         ],
         defaultTimeFormat = "?h:?m:?s?t",
         defaultDateFormat = "?DoM/?M/?Y",
