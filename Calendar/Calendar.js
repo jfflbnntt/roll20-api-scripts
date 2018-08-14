@@ -3,7 +3,7 @@
 var Calendar = Calendar || (function() {
     'use strict';
     
-    var version = 0.12,
+    var version = 0.13,
         helpMessage = "Calendar Help: see doc at https://github.com/jfflbnntt/roll20-api-scripts/blob/master/Calendar/Calendar.md",
         unitTable = {
             's': "second",
@@ -121,17 +121,17 @@ var Calendar = Calendar || (function() {
 
     showDate = function(calendarId, isWhisper) {
         var dateFormat = getAttr(calendarId, "dateFormat", defaultDateFormat).get("current");
-        showFormat(calendarId, "Date:", dateFormat, isWhisper);
+        showFormat(calendarId, "Date", dateFormat, isWhisper);
     },
 
     showTime = function(calendarId, isWhisper) {
         var timeFormat = getAttr(calendarId, "timeFormat", defaultTimeFormat).get("current");
-        showFormat(calendarId, "Time:", timeFormat, isWhisper);
+        showFormat(calendarId, "Time", timeFormat, isWhisper);
     },
 
     showFull = function(calendarId, isWhisper) {
         var fullFormat = getAttr(calendarId, "fullFormat", defaultFullFormat).get("current");
-        showFormat(calendarId, "Time and Day:", fullFormat, isWhisper);
+        showFormat(calendarId, "Time and Day", fullFormat, isWhisper);
     },
 
     showFormat = function(calendarId, from, formatMessage, isWhisper) {
@@ -142,7 +142,7 @@ var Calendar = Calendar || (function() {
         if(isWhisper == true)
             return "/w GM";
         else 
-            return "/desc";
+            return "/as Calendar";
     },
 
     getCalendarId = function() {
