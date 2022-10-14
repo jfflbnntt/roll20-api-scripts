@@ -70,12 +70,11 @@ var ConditionMarkers = ConditionMarkers || (function() {
             var i = 0;
             var size = _.size(selected);
             _.each(selected, function(token){ 
-                var num = "";
-                i = i+1;
-                if(size > 1) {
-                    num = i.toString 
-                }
-                statusMarkerOn(token, status, num); 
+                i += 1;
+                if(size > 1)
+                    statusMarkerOn(token, status, i); 
+                else
+                    statusMarkerOn(token, status);
             });            
         }
     },
