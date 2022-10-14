@@ -64,10 +64,17 @@ var ConditionMarkers = ConditionMarkers || (function() {
         }
     },
 
-    setCondition = function(selected, condition, num) {
+    setCondition = function(selected, condition) {
         var status = findStatus(condition);
         if (status) {
+            var i = 0;
+            var size = _.size(selected);
             _.each(selected, function(token){ 
+                var num = "";
+                i = i+1;
+                if(size > 1) {
+                    num = i.toString 
+                }
                 statusMarkerOn(token, status, num); 
             });            
         }
@@ -88,11 +95,11 @@ var ConditionMarkers = ConditionMarkers || (function() {
         });
     },
 
-    hasCondition = function(selected, condition, num) {
+    hasCondition = function(selected, condition) {
         var status = findStatus(condition);
         if (status) {
             return _.every(selected, function(token){
-                return hasStatusMarker(token, status, num);
+                return hasStatusMarker(token, status);
             });            
         }
     },
