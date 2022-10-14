@@ -73,17 +73,12 @@ function statusMarkersForToken(token) {
 }
 
 // check a token for a status by name
-function hasStatusMarker(token, statusId, num) {
+function hasStatusMarker(token, statusId) {
     if (typeof(token) != "undefined") {
         var tokenId = token._id || token;
         // could be boolean or string number
         var result = getObj("graphic",tokenId).get("status_"+statusId);
-        if (typeof(num) != "undefined") {
-            return result == num;
-        }
-        else {
-            return result == true;
-        }
+        return result != false;
     } else {
         return false;
     }    

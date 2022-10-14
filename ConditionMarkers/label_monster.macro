@@ -1,2 +1,2 @@
 # Label monster
-!setCondition ?{Color:|red|blue|green|brown|purple|pink|yellow} ?{Number:|1}
+!setCondition ?{Color:|red|blue|green|brown|purple|pink|yellow}
